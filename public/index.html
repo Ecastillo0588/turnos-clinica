@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presupuestos - Analítica</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Analítica de Presupuestos</h1>
+      <p class="subtitle">Explorá presupuestos clínicos sin usar Google Sheets</p>
+    </header>
+
+    <main class="app-layout">
+      <section class="card">
+        <h2>Buscar datos</h2>
+        <form id="filters-form" class="filters">
+          <div class="field-group">
+            <label for="fecha-desde">Fecha desde</label>
+            <input type="date" id="fecha-desde" name="fecha_desde" required />
+          </div>
+          <div class="field-group">
+            <label for="fecha-hasta">Fecha hasta</label>
+            <input type="date" id="fecha-hasta" name="fecha_hasta" required />
+          </div>
+          <div class="field-group">
+            <label for="estado">Estado (API)</label>
+            <input type="text" id="estado" name="estado" placeholder="Valido, Anulado..." />
+          </div>
+          <div class="field-group">
+            <label for="vendedor">Vendedor (API)</label>
+            <input type="text" id="vendedor" name="vendedor" placeholder="ID vendedor" />
+          </div>
+          <div class="actions">
+            <button type="submit">Consultar</button>
+            <button type="button" id="reset-button" class="secondary">Limpiar filtros locales</button>
+          </div>
+        </form>
+        <div class="helper-text">
+          Los campos de estado y vendedor se envían al backend. El resto de los filtros se aplican localmente.
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Filtros locales</h2>
+        <form id="local-filters" class="filters compact">
+          <div class="field-group">
+            <label for="filtro-vendedor">Vendedor</label>
+            <select id="filtro-vendedor" name="filtro_vendedor">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="filtro-cliente">Cliente</label>
+            <select id="filtro-cliente" name="filtro_cliente">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="filtro-articulo">Artículo</label>
+            <select id="filtro-articulo" name="filtro_articulo">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="buscar">Buscar texto</label>
+            <input type="search" id="buscar" name="buscar" placeholder="Cliente, artículo..." />
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Resumen</h2>
+        <div id="resumen" class="resume-grid"></div>
+      </section>
+
+      <section class="card charts">
+        <h2>Visualizaciones</h2>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Importe por estado</h3>
+            <canvas id="chart-estado" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Importe por vendedor</h3>
+            <canvas id="chart-vendedor" height="200"></canvas>
+          </div>
+          <div class="chart-card wide">
+            <h3>Top artículos (importe)</h3>
+            <canvas id="chart-articulos" height="200"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Detalle de filas</h2>
+          <button id="export-button" class="secondary small" type="button">Exportar CSV</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="tabla-detalle">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Logs</h2>
+        <pre id="logs" class="log-output"></pre>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <small>
+        Fuente backend: <code id="api-base">-</code> • Páginas máximas: <span id="max-pages">-</span>
+      </small>
+    </footer>
+  </body>
+</html>
