@@ -1,14 +1,23 @@
-{
-  "name": "turnos-clinica",
-  "version": "1.0.0",
-  "description": "Front-end de análisis para presupuestos clínicos",
-  "main": "server.js",
-  "type": "module",
-  "scripts": {
-    "start": "node server.js",
-    "test": "node -e \"console.log('No tests specified')\""
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT"
-}
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/package.json b/package.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..711ae5cb705c6df6cd9c83404723a670ec8e0c93
+--- /dev/null
++++ b/package.json
+@@ -0,0 +1,13 @@
++{
++  "name": "turnos-clinica",
++  "version": "1.0.0",
++  "description": "Front-end de análisis para presupuestos clínicos",
++  "main": "server.js",
++  "scripts": {
++    "start": "node server.js",
++    "test": "node -e \"console.log('No tests specified')\""
++  },
++  "keywords": [],
++  "author": "",
++  "license": "MIT"
++}
+ 
+EOF
+)
