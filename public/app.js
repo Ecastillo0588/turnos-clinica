@@ -1,34 +1,43 @@
+// --- Elementos del DOM ---
 const form = document.querySelector('#range-form');
 const fechaDesdeInput = document.querySelector('#fecha-desde');
 const fechaHastaInput = document.querySelector('#fecha-hasta');
 const fetchBtn = document.querySelector('#fetch-btn');
+
 const statusCard = document.querySelector('#status-card');
 const logList = document.querySelector('#log-list');
+
 const summaryCard = document.querySelector('#summary-card');
 const summaryGrid = document.querySelector('#summary-grid');
 const resumenText = document.querySelector('#resumen-text');
+
 const filtersCard = document.querySelector('#filters-card');
 const vendedorSelect = document.querySelector('#filter-vendedor');
 const clienteSelect = document.querySelector('#filter-cliente');
 const articuloInput = document.querySelector('#filter-articulo');
 const articulosDatalist = document.querySelector('#articulos-sugeridos');
 const clearFiltersBtn = document.querySelector('#clear-filters');
+
 const chartsCard = document.querySelector('#charts-card');
+
 const tableCard = document.querySelector('#table-card');
 const dataTableHead = document.querySelector('#data-table thead');
 const dataTableBody = document.querySelector('#data-table tbody');
 const searchInput = document.querySelector('#search');
 const downloadBtn = document.querySelector('#download-csv');
+
 const groupingCard = document.querySelector('#grouping-card');
 const groupBySelect = document.querySelector('#group-by');
 const groupTableWrapper = document.querySelector('#group-table-wrapper');
 
+// --- Charts (referencias a los canvas) ---
 const chartElements = {
   vendedores: document.querySelector('#chart-vendedores'),
   clientes: document.querySelector('#chart-clientes'),
   articulos: document.querySelector('#chart-articulos')
 };
 
+// --- Estado ---
 let originalRows = [];
 let filteredRows = [];
 let currentLog = [];
@@ -43,6 +52,7 @@ const activeFilters = {
   articulo: ''
 };
 
+// --- Columnas de la tabla ---
 const TABLE_HEADERS = [
   'id','fecha','comprobante','estado','cliente_id','cliente_descripcion',
   'vendedor_id','vendedor_descripcion','stock_origen_id','stock_origen_descripcion',
@@ -50,6 +60,7 @@ const TABLE_HEADERS = [
   'articulo_descripcion','cantidad','precio','descuento_item','importe_item','costo'
 ];
 
+// --- Init ---
 init();
 
 function init() {
@@ -60,6 +71,8 @@ function init() {
   fechaDesdeInput.value = toInputDate(weekAgo);
 
   form.addEventListener('submit', onSubmit);
+
+  // Filtros y eventos
   searchInput.addEventListener('input', () => {
     activeFilters.search = searchInput.value.trim().toLowerCase();
     applyFilters();
@@ -87,11 +100,13 @@ function init() {
     activeFilters.search = '';
     applyFilters();
   });
+
   downloadBtn.addEventListener('click', downloadCsv);
   groupBySelect.addEventListener('change', () => renderGrouping(filteredRows, groupBySelect.value));
   clearFiltersBtn.disabled = true;
 }
 
+// --- Submit / Fetch ---
 async function onSubmit(evt) {
   evt.preventDefault();
   const fechaDesde = fechaDesdeInput.value;
@@ -101,7 +116,6 @@ async function onSubmit(evt) {
     alert('Debés indicar ambas fechas.');
     return;
   }
-
   if (fechaDesde > fechaHasta) {
     alert('La fecha desde no puede ser mayor a la fecha hasta.');
     return;
@@ -120,16 +134,20 @@ async function onSubmit(evt) {
     }
 
     const payload = await response.json();
+
+    // Datos base
     originalRows = Array.isArray(payload.rows) ? payload.rows : [];
     filteredRows = originalRows;
     currentLog = Array.isArray(payload.log) ? payload.log : [];
     baseResumen = payload.resumen ?? '';
-    originalMetrics = payload.totals ?? calculateMetrics(originalRows);
+    originalMetrics = payload.totals ?? payload.metrics ?? calculateMetrics(originalRows);
 
+    // UI inicial
     populateFilters(payload.filterOptions ?? {});
     renderLogs(currentLog);
-
     statusCard.classList.remove('hidden');
+
+    // Render con filtros aplicados
     applyFilters();
   } catch (err) {
     alert(err.message);
@@ -138,6 +156,7 @@ async function onSubmit(evt) {
   }
 }
 
+// --- Logs ---
 function renderLogs(logEntries) {
   logList.innerHTML = '';
   if (!logEntries.length) {
@@ -150,21 +169,26 @@ function renderLogs(logEntries) {
   const fragment = document.createDocumentFragment();
   for (const entry of logEntries) {
     const li = document.createElement('li');
+
     const ts = document.createElement('span');
     ts.className = 'timestamp';
     ts.textContent = formatDateTime(entry.timestamp);
+
     const level = document.createElement('span');
     level.className = 'level';
     level.textContent = entry.level;
+
     const message = document.createElement('span');
     message.className = 'message';
     message.textContent = entry.message;
+
     li.append(level, ts, message);
     fragment.appendChild(li);
   }
   logList.appendChild(fragment);
 }
 
+// --- Filtros + Render principal ---
 function applyFilters() {
   if (!originalRows.length) {
     renderSummaryFromRows([]);
@@ -190,6 +214,7 @@ function applyFilters() {
   const articleLower = articleFilter ? articleFilter.toLowerCase() : null;
 
   filteredRows = originalRows.filter(row => {
+    // Vendedor
     if (vendorFilter) {
       if (vendorFilter === '__empty__') {
         const vendorId = String(row?.vendedor_id ?? '').trim();
@@ -202,6 +227,7 @@ function applyFilters() {
       }
     }
 
+    // Cliente
     if (clientFilter) {
       if (clientFilter === '__empty__') {
         const clientId = String(row?.cliente_id ?? '').trim();
@@ -214,6 +240,7 @@ function applyFilters() {
       }
     }
 
+    // Artículo
     if (articleFilter) {
       if (articleFilter === '__empty__') {
         const articleId = String(row?.articulo_id ?? '').trim();
@@ -226,6 +253,7 @@ function applyFilters() {
       }
     }
 
+    // Search libre sobre todas las columnas
     if (searchFilter) {
       const matches = TABLE_HEADERS.some(header => {
         const value = row?.[header];
@@ -251,6 +279,7 @@ function applyFilters() {
   updateClearButtonState();
 }
 
+// --- Resumen / Métricas ---
 function renderSummaryFromRows(rows) {
   const metrics = calculateMetrics(rows);
   summaryGrid.innerHTML = '';
@@ -301,6 +330,7 @@ function updateResumenText(filteredCount) {
   resumenText.textContent = messageParts.join(' · ');
 }
 
+// --- Tabla ---
 function renderTable(rows) {
   dataTableHead.innerHTML = '';
   dataTableBody.innerHTML = '';
@@ -314,6 +344,7 @@ function renderTable(rows) {
   dataTableHead.appendChild(headRow);
 
   if (!rows.length) {
+    downloadBtn.disabled = true;
     return;
   }
 
@@ -329,8 +360,11 @@ function renderTable(rows) {
     fragment.appendChild(tr);
   }
   dataTableBody.appendChild(fragment);
+
+  downloadBtn.disabled = !rows.length;
 }
 
+// --- Agrupación ---
 function renderGrouping(rows, column) {
   groupTableWrapper.innerHTML = '';
   if (!column || !rows.length) {
@@ -396,6 +430,7 @@ function renderGrouping(rows, column) {
   groupTableWrapper.appendChild(table);
 }
 
+// --- Charts ---
 function renderCharts(rows) {
   if (!rows.length) {
     chartsCard.classList.add('hidden');
@@ -461,19 +496,11 @@ function updateChart(key, canvas, dataset, datasetLabel) {
       },
       scales: {
         x: {
-          ticks: {
-            autoSkip: false,
-            maxRotation: 45,
-            minRotation: 0
-          }
+          ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 }
         },
         y: {
           beginAtZero: true,
-          ticks: {
-            callback(value) {
-              return formatCurrency(value);
-            }
-          }
+          ticks: { callback(value) { return formatCurrency(value); } }
         }
       }
     }
@@ -552,6 +579,7 @@ function populateDatalist(datalist, options) {
   datalist.appendChild(fragment);
 }
 
+// --- CSV ---
 function downloadCsv() {
   if (!filteredRows.length) return;
   const headers = TABLE_HEADERS;
@@ -571,6 +599,7 @@ function downloadCsv() {
   URL.revokeObjectURL(url);
 }
 
+// --- Reset / Loading ---
 function resetUI() {
   originalRows = [];
   filteredRows = [];
@@ -595,6 +624,7 @@ function resetUI() {
   dataTableHead.innerHTML = '';
   dataTableBody.innerHTML = '';
   groupTableWrapper.innerHTML = '';
+
   vendedorSelect.innerHTML = '<option value="">Todos</option>';
   clienteSelect.innerHTML = '<option value="">Todos</option>';
   articuloInput.value = '';
@@ -604,15 +634,6 @@ function resetUI() {
   downloadBtn.disabled = true;
   destroyCharts();
   groupBySelect.value = '';
-}
-
-function destroyCharts() {
-  for (const key of Object.keys(chartInstances)) {
-    if (chartInstances[key]) {
-      chartInstances[key].destroy();
-      chartInstances[key] = null;
-    }
-  }
 }
 
 function toggleLoading(isLoading) {
@@ -655,6 +676,7 @@ function calculateMetrics(rows) {
   };
 }
 
+// --- Utils de formato ---
 function formatNumber(value) {
   const number = Number(value) || 0;
   return new Intl.NumberFormat('es-AR').format(number);
@@ -692,12 +714,8 @@ function formatDateTime(isoString) {
   const date = new Date(isoString);
   if (Number.isNaN(date.getTime())) return isoString;
   return new Intl.DateTimeFormat('es-AR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
   }).format(date);
 }
 
@@ -719,4 +737,14 @@ function escapeCsv(value) {
     return `"${stringValue.replace(/"/g, '""')}"`;
   }
   return stringValue;
+}
+
+// --- Charts helpers ---
+function destroyCharts() {
+  for (const key of Object.keys(chartInstances)) {
+    if (chartInstances[key]) {
+      chartInstances[key].destroy();
+      chartInstances[key] = null;
+    }
+  }
 }

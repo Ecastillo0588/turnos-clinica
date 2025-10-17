@@ -25,9 +25,7 @@
   }
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -74,9 +72,7 @@ body {
   box-shadow: 0 10px 30px var(--shadow);
 }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 .form-grid {
   display: flex;
@@ -92,9 +88,7 @@ body {
   gap: 0.35rem;
 }
 
-.field label {
-  font-weight: 600;
-}
+.field label { font-weight: 600; }
 
 input[type="date"],
 input[type="search"],
@@ -207,9 +201,7 @@ button:not(:disabled):hover {
   align-items: center;
 }
 
-.log-list li:last-child {
-  border-bottom: none;
-}
+.log-list li:last-child { border-bottom: none; }
 
 .log-list .level {
   font-weight: 600;
@@ -233,10 +225,9 @@ button:not(:disabled):hover {
   margin-bottom: 1rem;
 }
 
-.table-wrapper {
-  overflow: auto;
-}
+.table-wrapper { overflow: auto; }
 
+/* ---- Filtros ---- */
 .filters-header {
   display: flex;
   align-items: center;
@@ -257,6 +248,7 @@ button:not(:disabled):hover {
   font-size: 0.9rem;
 }
 
+/* ---- Charts ---- */
 .charts-grid {
   display: grid;
   gap: 1.5rem;
@@ -277,10 +269,9 @@ button:not(:disabled):hover {
   color: var(--muted);
 }
 
-.chart-panel canvas {
-  width: 100%;
-}
+.chart-panel canvas { width: 100%; }
 
+/* ---- Tabla ---- */
 #data-table {
   width: 100%;
   border-collapse: collapse;
@@ -292,6 +283,7 @@ button:not(:disabled):hover {
   top: 0;
   background: var(--card-bg);
   box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+  z-index: 1;
 }
 
 #data-table th,
@@ -306,6 +298,7 @@ button:not(:disabled):hover {
   background: rgba(14, 116, 144, 0.08);
 }
 
+/* ---- Agrupaciones ---- */
 .grouping-header {
   display: flex;
   flex-wrap: wrap;
