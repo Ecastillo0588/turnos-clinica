@@ -1,0 +1,14 @@
+{
+  "name": "turnos-clinica",
+  "version": "1.0.0",
+  "description": "Front-end de análisis para presupuestos clínicos",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node -e \"console.log('No tests specified')\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
