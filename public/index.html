@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Presupuestos - Analítica</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="container">
+      <h1>Presupuestos - Analítica</h1>
+      <p>Explorá el detalle de presupuestos entre fechas sin necesidad de usar hojas de cálculo.</p>
+    </div>
+  </header>
+  <main class="container">
+    <section class="card">
+      <form id="range-form" class="form-grid">
+        <div class="field">
+          <label for="fecha-desde">Fecha desde</label>
+          <input type="date" id="fecha-desde" name="fecha_desde" required />
+        </div>
+        <div class="field">
+          <label for="fecha-hasta">Fecha hasta</label>
+          <input type="date" id="fecha-hasta" name="fecha_hasta" required />
+        </div>
+        <div class="actions">
+          <button type="submit" id="fetch-btn">Consultar</button>
+        </div>
+      </form>
+      <p class="hint">Se consultan hasta 10 páginas de 2000 filas cada una. El servicio se invoca respetando el flujo del script original.</p>
+    </section>
+
+    <section id="status-card" class="card hidden">
+      <h2>Progreso</h2>
+      <ul id="log-list" class="log-list"></ul>
+    </section>
+
+    <section id="summary-card" class="card hidden">
+      <h2>Resumen</h2>
+      <div class="summary-grid" id="summary-grid"></div>
+      <p id="resumen-text" class="resumen-text"></p>
+    </section>
+
+    <section id="grouping-card" class="card hidden">
+      <div class="grouping-header">
+        <h2>Agregados dinámicos</h2>
+        <label for="group-by">Agrupar por</label>
+        <select id="group-by">
+          <option value="">— Seleccioná una columna —</option>
+          <option value="cliente_descripcion">Cliente</option>
+          <option value="vendedor_descripcion">Vendedor</option>
+          <option value="articulo_descripcion">Artículo</option>
+          <option value="estado">Estado</option>
+          <option value="fecha">Fecha</option>
+          <option value="stock_origen_descripcion">Depósito</option>
+        </select>
+      </div>
+      <div id="group-table-wrapper" class="table-wrapper"></div>
+    </section>
+
+    <section id="table-card" class="card hidden">
+      <div class="table-header">
+        <h2>Detalle recibido</h2>
+        <input type="search" id="search" placeholder="Filtrar por texto…" />
+        <button id="download-csv" type="button" disabled>Descargar CSV</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="data-table">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <footer class="app-footer">
+    <div class="container">
+      <small>Construido para facilitar el análisis de presupuestos sin depender de hojas de cálculo.</small>
+    </div>
+  </footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
