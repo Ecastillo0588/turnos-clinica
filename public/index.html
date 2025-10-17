@@ -13,6 +13,7 @@
       <p>Explorá el detalle de presupuestos entre fechas sin necesidad de usar hojas de cálculo.</p>
     </div>
   </header>
+
   <main class="container">
     <section class="card">
       <form id="range-form" class="form-grid">
@@ -40,6 +41,51 @@
       <h2>Resumen</h2>
       <div class="summary-grid" id="summary-grid"></div>
       <p id="resumen-text" class="resumen-text"></p>
+    </section>
+
+    <section id="filters-card" class="card hidden">
+      <div class="filters-header">
+        <h2>Filtros interactivos</h2>
+        <button type="button" id="clear-filters" class="ghost">Limpiar filtros</button>
+      </div>
+      <div class="filters-grid">
+        <div class="field">
+          <label for="filter-vendedor">Vendedor</label>
+          <select id="filter-vendedor">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="filter-cliente">Cliente</label>
+          <select id="filter-cliente">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="filter-articulo">Artículo / SKU</label>
+          <input type="text" id="filter-articulo" placeholder="Buscá por descripción o código" list="articulos-sugeridos" />
+          <datalist id="articulos-sugeridos"></datalist>
+        </div>
+      </div>
+      <p class="filters-hint">Los filtros se combinan con la búsqueda rápida para refinar los resultados y visualizar solo la información relevante.</p>
+    </section>
+
+    <section id="charts-card" class="card hidden">
+      <h2>Visualizaciones</h2>
+      <div class="charts-grid">
+        <div class="chart-panel">
+          <h3>Importe por vendedor</h3>
+          <canvas id="chart-vendedores" height="220"></canvas>
+        </div>
+        <div class="chart-panel">
+          <h3>Importe por cliente</h3>
+          <canvas id="chart-clientes" height="220"></canvas>
+        </div>
+        <div class="chart-panel">
+          <h3>Importe por artículo</h3>
+          <canvas id="chart-articulos" height="220"></canvas>
+        </div>
+      </div>
     </section>
 
     <section id="grouping-card" class="card hidden">
@@ -73,11 +119,17 @@
       </div>
     </section>
   </main>
+
   <footer class="app-footer">
     <div class="container">
       <small>Construido para facilitar el análisis de presupuestos sin depender de hojas de cálculo.</small>
     </div>
   </footer>
+
+  <!-- Chart.js para las visualizaciones -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-3q6jwxKF1uHmIiMaivGi99ZTSdKCbFf8gLuwZQzQ0jrISFRCGDpa2BkLomqKgJo0" crossorigin="anonymous"></script>
+
+  <!-- App -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
