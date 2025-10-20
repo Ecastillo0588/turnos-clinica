@@ -1,9 +1,9 @@
 /* ======== Helpers DOM ======== */
-const $ = s => document.querySelector(s);
+const $  = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const statusEl = $('#status');
 
-/* ======== Estado global de filtros ======== */
+/* ======== Estado global de filtros (solo en memoria) ======== */
 const state = {
   from: '', to: '',
   vendedores: new Set(),
@@ -15,8 +15,8 @@ const state = {
 
 /* ======== Elementos ======== */
 const fDesde = $('#f-desde'), fHasta = $('#f-hasta');
-const fVend = $('#f-vendedor'), fCli = $('#f-cliente'), fSuc = $('#f-sucursal');
-const fId = $('#f-id'), btnApply = $('#btn-apply'), btnClear = $('#btn-clear'), btnCsv = $('#btn-csv');
+const fVend  = $('#f-vendedor'), fCli = $('#f-cliente'), fSuc = $('#f-sucursal');
+const fId    = $('#f-id'), btnApply = $('#btn-apply'), btnClear = $('#btn-clear'), btnCsv = $('#btn-csv');
 const activeFilters = $('#active-filters');
 const topN = $('#topN');
 
@@ -33,8 +33,8 @@ const topArt = $('#top-art');
 const tblArt = $('#tbl-art tbody');
 
 /* ======== Datos en memoria ======== */
-let rows = [];       // ítems normalizados (_ingreso/_costo/_margen/_pct)
-let heads = [];      // cabeceras agregadas por id (con rows)
+let rows = [];         // ítems normalizados (_ingreso/_costo/_margen/_pct)
+let headsAll = [];     // cabeceras agregadas por id (dataset completo)
 
 /* ======== Charts ======== */
 let chVend=null, chCli=null, chSuc=null;
@@ -42,12 +42,13 @@ let chVend=null, chCli=null, chSuc=null;
 /* ======== Init ======== */
 init();
 async function init(){
-  // fechas por defecto
+  // Fechas por defecto: hoy, sin persistir en localStorage
   const t = new Date(), y=t.getFullYear(), m=String(t.getMonth()+1).padStart(2,'0'), d=String(t.getDate()).padStart(2,'0');
-  fDesde.value = localStorage.getItem('from') || `${y}-${m}-${d}`;
-  fHasta.value = localStorage.getItem('to') || `${y}-${m}-${d}`;
+  // Si llegan por querystring, las usamos; si no, hoy
+  const url = new URL(location.href);
+  fDesde.value = url.searchParams.get('from') || `${y}-${m}-${d}`;
+  fHasta.value = url.searchParams.get('to')   || `${y}-${m}-${d}`;
 
-  restoreState();
   bindUI();
   await fetchAndRender(); // primera carga
 }
@@ -57,8 +58,15 @@ function bindUI(){
   btnClear.addEventListener('click', () => { clearFilters(); render(); });
   btnCsv.addEventListener('click', exportCSV);
 
-  topN.addEventListener('change', ()=>{ state.topN = Number(topN.value)||10; drawChartsFrom(applyFilters(rows)); });
-  topArt.addEventListener('change', ()=> renderTopArt(applyFilters(rows)));
+  topN.addEventListener('change', ()=>{
+    state.topN = Number(topN.value)||10;
+    // Al cambiar TopN, solo re-dibujar derivados de "filtered"
+    const filtered = applyFilters(rows);
+    drawChartsFrom(filtered);
+    renderAggTables(filtered);
+  });
+
+  topArt?.addEventListener('change', ()=> renderTopArt(applyFilters(rows)));
 
   // Tabs (generales y del drawer)
   $$('.tab').forEach(b=>{
@@ -81,7 +89,11 @@ function bindUI(){
   // Buscar ID en tabla presupuestos (debounce)
   let tId = 0;
   qId.addEventListener('input', () => {
-    clearTimeout(tId); tId = setTimeout(()=> renderHeads(qId.value.trim()), 250);
+    clearTimeout(tId); tId = setTimeout(()=> {
+      // usar el dataset filtrado actual
+      const filtered = applyFilters(rows);
+      renderHeads(qId.value.trim(), filtered);
+    }, 250);
   });
 }
 
@@ -89,9 +101,9 @@ function bindUI(){
 async function fetchAndRender(){
   // validar fechas
   const from = fDesde.value, to = fHasta.value || from;
-  if (!from) return alert('Elegí "Desde"'); if (to<from) return alert('"Hasta" < "Desde"');
+  if (!from) return alert('Elegí "Desde"'); 
+  if (to<from) return alert('"Hasta" < "Desde"');
   state.from = from; state.to = to;
-  localStorage.setItem('from', from); localStorage.setItem('to', to);
 
   disableUI(true); setStatus('Consultando servicio…');
   try {
@@ -100,19 +112,16 @@ async function fetchAndRender(){
     if (!resp.ok || !json.ok) throw new Error(json.error || 'Error de API');
 
     rows = (json.data||[]).map(normaRow);
-    heads = buildHeads(rows);
+    headsAll = buildHeads(rows);
 
     // poblar selects (listas del conjunto)
     hydrateSelect(fVend, unique(rows.map(r=>r.vendedor)));
     hydrateSelect(fCli,  unique(rows.map(r=>r.cliente)));
     hydrateSelect(fSuc,  unique(rows.map(r=>r.sucursal)));
 
-    // restaurar selección previa
-    reapplySelect(fVend, state.vendedores); reapplySelect(fCli, state.clientes); reapplySelect(fSuc, state.sucursales);
-
     render();
     btnCsv.disabled = rows.length===0;
-    setStatus(`OK. Ítems=${rows.length}. Rango ${json.from} → ${json.to}`);
+    setStatus(`OK. Ítems=${rows.length.toLocaleString('es-AR')}. Rango ${json.from} → ${json.to}`);
   } catch(e){
     console.error(e); setStatus('Error: '+e.message); alert(e.message);
   } finally {
@@ -180,11 +189,11 @@ function renderTopArt(data){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${esc(v.key)}</td>
-      <td>${int(v.items)}</td>
-      <td>${int(v.cant)}</td>
-      <td>${money(v.ingreso)}</td>
-      <td>${money(v.precioProm)}</td>
-      <td>${money(v.margen)}</td>
+      <td class="num">${int(v.items)}</td>
+      <td class="num">${int(v.cant)}</td>
+      <td class="num">${money(v.ingreso)}</td>
+      <td class="num">${money(v.precioProm)}</td>
+      <td class="num">${money(v.margen)}</td>
       <td class="${mclass(v.pct)}">${pct(v.pct)}</td>
     `;
     tblArt.appendChild(tr);
@@ -203,7 +212,7 @@ function applyFilters(data){
   const vend = state.vendedores, cli = state.clientes, suc = state.sucursales;
   const id = state.presuId;
   return data.filter(r=>{
-    if (id && String(r.id)!==id) return false;
+    if (id && String(r.id)!==id) return false; // match exacto by design
     if (vend.size && !vend.has(r.vendedor)) return false;
     if (cli.size && !cli.has(r.cliente)) return false;
     if (suc.size && !suc.has(r.sucursal)) return false;
@@ -224,30 +233,75 @@ function renderAggTables(filtered){
   paintAggTable(tblCli,  aggregate(filtered, r=>r.cliente),  'cliente');
   paintAggTable(tblSuc,  aggregate(filtered, r=>r.sucursal), 'sucursal');
 }
+
+/* === FIX layout de barras horizontales ===
+   - Labels compactos para ticks grandes
+   - maintainAspectRatio:false para respetar el contenedor
+   - Altura dinámica según cantidad de barras
+   - Limitar cantidad de ticks en eje X
+   - Canvas 100% del contenedor (no empuja el grid)
+*/
 function drawCharts(aggVend, aggCli, aggSuc){
   const n = state.topN;
   const vendArr = topBy(aggVend,'ingreso',n), cliArr = topBy(aggCli,'ingreso',n), sucArr = topBy(aggSuc,'ingreso',n);
 
+  // Altura sugerida: ~28px por barra (mínimo 160)
+  const heightFor = (len)=> Math.max(160, 28*len + 24);
+
   chVend && chVend.destroy();
-  chVend = miniBar($('#chartVend'), vendArr.map(x=>x.key), vendArr.map(x=>round2(x.ingreso)), (label)=>toggleFilter('vendedores',label));
+  const cv = $('#chartVend');
+  cv.height = heightFor(vendArr.length);
+  chVend = miniBar(cv, vendArr.map(x=>x.key), vendArr.map(x=>round2(x.ingreso)), (label)=>toggleFilter('vendedores',label));
+
   chCli && chCli.destroy();
-  chCli = miniBar($('#chartCli'), cliArr.map(x=>x.key), cliArr.map(x=>round2(x.ingreso)), (label)=>toggleFilter('clientes',label));
+  const cc = $('#chartCli');
+  cc.height = heightFor(cliArr.length);
+  chCli = miniBar(cc, cliArr.map(x=>x.key), cliArr.map(x=>round2(x.ingreso)), (label)=>toggleFilter('clientes',label));
+
   chSuc && chSuc.destroy();
-  chSuc = miniBar($('#chartSuc'), sucArr.map(x=>x.key), sucArr.map(x=>round2(x.ingreso)), (label)=>toggleFilter('sucursales',label));
+  const cs = $('#chartSuc');
+  cs.height = heightFor(sucArr.length);
+  chSuc = miniBar(cs, sucArr.map(x=>x.key), sucArr.map(x=>round2(x.ingreso)), (label)=>toggleFilter('sucursales',label));
 }
+
 function miniBar(canvas, labels, data, onClick){
+  // Contenedor del canvas mantiene el ancho del grid; el chart nunca lo expande
+  canvas.style.width = '100%';
+
   return new Chart(canvas, {
     type:'bar',
-    data:{labels, datasets:[{label:'Ingreso', data}]},
+    data:{labels, datasets:[{label:'Ingreso', data, borderWidth:0}]},
     options:{
       responsive:true,
-      plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>money(c.parsed.y)}}},
+      maintainAspectRatio:false,        // clave para no “ensanchar” el grid
+      animation:false,
+      layout:{ padding:{right:8, left:8} },
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{ label:(c)=>money(c.parsed.x ?? c.parsed.y ?? c.parsed) }
+        }
+      },
       indexAxis:'y',
       onClick:(_, els)=>{ if(els?.length){ const i=els[0].index; onClick(labels[i]); } },
-      scales:{ x:{ ticks:{ callback:v=>money(v)} } }
+      scales:{
+        x:{
+          ticks:{
+            // Labels compactas: evitan números larguísimos que empujan layout
+            callback:v => moneyCompact(v),
+            maxTicksLimit: 6
+          },
+          grid:{ display:false }
+        },
+        y:{
+          ticks:{ autoSkip:true, maxTicksLimit: 12 },
+          grid:{ display:false }
+        }
+      }
     }
   });
 }
+
 function paintAggTable(tbody, aggObj, kind){
   const arr = topBy(aggObj,'ingreso',Infinity);
   tbody.innerHTML='';
@@ -255,10 +309,10 @@ function paintAggTable(tbody, aggObj, kind){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${esc(v.key)}</td>
-      <td>${int(v.presu)}</td>
-      <td>${int(v.items)}</td>
-      <td>${money(v.ingreso)}</td>
-      <td>${money(v.margen)}</td>
+      <td class="num">${int(v.presu)}</td>
+      <td class="num">${int(v.items)}</td>
+      <td class="num">${money(v.ingreso)}</td>
+      <td class="num">${money(v.margen)}</td>
       <td class="${mclass(v.pct)}">${pct(v.pct)}</td>`;
     tr.addEventListener('click', ()=>toggleFilter(kind==='vendedor'?'vendedores':kind==='cliente'?'clientes':'sucursales', v.key));
     tbody.appendChild(tr);
@@ -268,7 +322,8 @@ function paintAggTable(tbody, aggObj, kind){
 /* ======== Heads & Drawer ======== */
 function renderHeads(searchExact='', filteredRows=null){
   const FR = filteredRows || applyFilters(rows);
-  const set = buildHeads(FR);
+  const set = buildHeads(FR);   // se recalcula SOLO para el subconjunto filtrado
+
   // orden por Ingreso desc, tie-break fecha desc
   set.sort((a,b)=> b.ingreso - a.ingreso || (a.fecha<b.fecha?1:-1));
 
@@ -289,10 +344,10 @@ function renderHeads(searchExact='', filteredRows=null){
       <td>${esc(h.cliente)}</td>
       <td>${esc(h.vendedor)}</td>
       <td>${esc(h.sucursal)}</td>
-      <td>${int(h.items)}</td>
-      <td>${money(h.ingreso)}</td>
-      <td>${money(h.costo)}</td>
-      <td>${money(h.margen)}</td>
+      <td class="num">${int(h.items)}</td>
+      <td class="num">${money(h.ingreso)}</td>
+      <td class="num">${money(h.costo)}</td>
+      <td class="num">${money(h.margen)}</td>
       <td class="${mclass(h.pct)}">${pct(h.pct)}</td>`;
     tr.addEventListener('click', ()=>openDrawer(h));
     tblHeads.appendChild(tr);
@@ -320,11 +375,11 @@ function openDrawer(h){
     const tr=document.createElement('tr');
     tr.innerHTML = `
       <td>${esc(r.articulo)}</td>
-      <td>${int(r._cant)}</td>
-      <td>${money(r.precio)}</td>
-      <td>${money(r._ingreso)}</td>
-      <td>${money(r._costo)}</td>
-      <td>${money(r._margen)}</td>
+      <td class="num">${int(r._cant)}</td>
+      <td class="num">${money(r.precio)}</td>
+      <td class="num">${money(r._ingreso)}</td>
+      <td class="num">${money(r._costo)}</td>
+      <td class="num">${money(r._margen)}</td>
       <td class="${mclass(r._pct)}">${pct(r._pct)}</td>`;
     dwBody.appendChild(tr);
   }
@@ -336,8 +391,8 @@ function openDrawer(h){
       const tr=document.createElement('tr');
       tr.innerHTML = `
         <td>${g[0]}</td><td>${esc(v.key)}</td>
-        <td>${int(v.items)}</td><td>${money(v.ingreso)}</td><td>${money(v.costo)}</td>
-        <td>${money(v.margen)}</td><td class="${mclass(v.pct)}">${pct(v.pct)}</td>`;
+        <td class="num">${int(v.items)}</td><td class="num">${money(v.ingreso)}</td><td class="num">${money(v.costo)}</td>
+        <td class="num">${money(v.margen)}</td><td class="${mclass(v.pct)}">${pct(v.pct)}</td>`;
       dwResBody.appendChild(tr);
     }
   }
@@ -358,7 +413,7 @@ function exportCSV(){
     ['fecha','id','comprobante','cliente','vendedor','sucursal','items','ingreso','costo','margen','pct'],
     headsSet
   ));
-  // Export de ítems (aunque no haya tabla global, sigue siendo útil)
+  // Export de ítems
   downloadCSV('items.csv', toCSV(
     ['fecha','id','comprobante','estado','cliente','vendedor','sucursal','articulo','_cant','precio','_ingreso','_costo','_margen','_pct'],
     filtered
@@ -402,7 +457,11 @@ function aggregate(data, keyFn){
     a.items++; a.ingreso+=r._ingreso; a.costo+=r._costo; a.margen+=r._margen; a._set.add(r.id);
     m.set(k,a);
   }
-  for (const v of m.values()) v.presu = v._set.size, v.pct = v.ingreso>0 ? v.margen/v.ingreso : 0;
+  for (const v of m.values()){
+    v.presu = v._set.size;
+    v.pct = v.ingreso>0 ? v.margen/v.ingreso : 0;
+    delete v._set; // evitar “filtrarse” en export o UI
+  }
   return Object.fromEntries(Array.from(m.values()).map(v=>[v.key,v]));
 }
 function topBy(obj, field, n){
@@ -420,7 +479,13 @@ const sum=(arr,fn)=>arr.reduce((s,x)=>s+(fn?fn(x):x),0);
 /* ======== UI helpers ======== */
 function hydrateSelect(sel, list){
   const prev = new Set(Array.from(sel.selectedOptions).map(o=>o.value));
-  sel.innerHTML = ''; list.sort().forEach(v=>{ const o=document.createElement('option'); o.value=o.textContent=v; if(prev.has(v)) o.selected=true; sel.appendChild(o); });
+  sel.innerHTML = '';
+  list.sort().forEach(v=>{
+    const o=document.createElement('option'); 
+    o.value=o.textContent=v; 
+    if(prev.has(v)) o.selected=true; 
+    sel.appendChild(o);
+  });
 }
 function reapplySelect(sel, set){ Array.from(sel.options).forEach(o=>{ o.selected = set.has(o.value); }); }
 function unique(arr){ return Array.from(new Set(arr)); }
@@ -436,7 +501,11 @@ function paintActiveFilters(){
     set.forEach(v=>{
       const el=document.createElement('span');
       el.className='af'; el.textContent=`${label}: ${v}`;
-      const x=document.createElement('button'); x.textContent='×'; x.addEventListener('click', ()=>{ set.delete(v); reapplySelect(group==='Vend'?fVend:group==='Cli'?fCli:fSuc, set); render(); });
+      const x=document.createElement('button'); x.textContent='×'; x.addEventListener('click', ()=>{
+        set.delete(v);
+        reapplySelect(group==='Vend'?fVend:group==='Cli'?fCli:fSuc, set); 
+        render();
+      });
       el.appendChild(x); activeFilters.appendChild(el);
     });
   };
@@ -445,14 +514,26 @@ function paintActiveFilters(){
   push('Suc',  state.sucursales, 'Suc');
 }
 
-function disableUI(b){ [fDesde,fHasta,fVend,fCli,fSuc,fId,btnApply,btnClear,btnCsv,topN,topArt].forEach(el=>el.disabled=b); }
+function disableUI(b){ [fDesde,fHasta,fVend,fCli,fSuc,fId,btnApply,btnClear,btnCsv,topN,topArt].forEach(el=>el && (el.disabled=b)); }
 function setStatus(msg){ statusEl.textContent=msg; }
 
+/* ======== Formatos ======== */
 function money(n){ const v=Number(n)||0; return v.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function int(n){ const v=Number(n)||0; return v.toLocaleString('es-AR'); }
 function pct(p){ return ((Number(p)||0)*100).toFixed(1)+'%'; }
 function round2(x){ return Math.round((Number(x)||0)*100)/100; }
-function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&gt;','>':'&quot;',"'":'&#39;'}[m])); }
+
+// FIX de escapado correcto (antes '>' mapeaba a &quot;)
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+
 function fmtDate(ymd){ if(!ymd) return ''; const [Y,M,D]=String(ymd).split('-'); return `${D}/${M}/${Y}`; }
 function mclass(p){
   const v=(Number(p)||0)*100;
@@ -462,6 +543,17 @@ function mclass(p){
   if (v<30) return 'ok2';
   return 'ok';
 }
+
+function moneyCompact(n){
+  try {
+    return new Intl.NumberFormat('es-AR', {
+      notation: 'compact', compactDisplay: 'short',
+      maximumFractionDigits: 2
+    }).format(Number(n)||0);
+  } catch { return money(n); }
+}
+
+/* ======== CSV ======== */
 function toCSV(headers, arr){
   const lines=[headers.join(',')];
   for (const o of arr){
@@ -473,23 +565,7 @@ function toCSV(headers, arr){
 function csvCell(v){ if(v===null||v===undefined) return ''; const s=String(v); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; }
 function downloadCSV(name,text){ const blob=new Blob([text],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url); }
 
-/* ======== Persistencia simple ======== */
-function restoreState(){
-  const s = JSON.parse(localStorage.getItem('panel_state')||'{}');
-  if (s.vendedores) state.vendedores=new Set(s.vendedores);
-  if (s.clientes) state.clientes=new Set(s.clientes);
-  if (s.sucursales) state.sucursales=new Set(s.sucursales);
-  if (s.topN) state.topN=s.topN;
-  topN.value = state.topN;
-}
-window.addEventListener('beforeunload', ()=>{
-  localStorage.setItem('panel_state', JSON.stringify({
-    vendedores:[...state.vendedores], clientes:[...state.clientes], sucursales:[...state.sucursales],
-    topN:state.topN
-  }));
-});
-
-/* ======== Utilidad: limpiar filtros ======== */
+/* ======== Limpiar filtros ======== */
 function clearFilters(){
   state.vendedores.clear();
   state.clientes.clear();
@@ -502,13 +578,3 @@ function clearFilters(){
   qId.value = '';
   topN.value = String(state.topN || 10);
 }
-
-function moneyCompact(n){
-  try {
-    return new Intl.NumberFormat('es-AR', {
-      notation: 'compact', compactDisplay: 'short',
-      maximumFractionDigits: 2
-    }).format(Number(n)||0);
-  } catch { return money(n); }
-}
-
