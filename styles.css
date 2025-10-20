@@ -9,13 +9,16 @@
   --fs-12:12px; --fs-14:14px; --fs-20:20px;
   --r-8:8px; --r-12:12px; --shadow-1:0 6px 18px rgba(0,0,0,.25);
 
-  /* === Anchos de columnas (fuente de verdad para fallback) === */
+  /* Drawer */
+  --drawer-w: 640px; /* ← cambiá el ancho del sidebar acá */
+
+  /* Anchos de columnas (fallback si no hay <colgroup>) */
   --w-fecha:10%; --w-id:9%; --w-comp:14%; --w-cliente:17%;
   --w-vend:14%; --w-suc:12%; --w-items:6%;
   --w-ing:8%; --w-cost:8%; --w-marg:8%; --w-pct:4%;
 }
 
-/* Base */
+/* ===== Base ===== */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -24,7 +27,7 @@ body{
   line-height:1.45;
 }
 
-/* Topbar & filtros */
+/* ===== Topbar & filtros ===== */
 .appbar{
   position:sticky; top:0; z-index:20;
   background:linear-gradient(180deg,#121820,rgba(18,24,32,.9));
@@ -55,24 +58,27 @@ button.ghost:hover{border-color:var(--gold); color:var(--gold)}
   border-color:var(--gold);
 }
 
-/* Layout */
+/* ===== Layout ===== */
 .container{max-width:1400px; margin:18px auto; padding:0 16px; display:grid; gap:18px}
 .cards{display:grid; gap:12px}
 .cards-6{grid-template-columns:repeat(6,1fr)}
 .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-12); padding:12px; box-shadow:var(--shadow-1)}
 .card-title{font-size:var(--fs-12); color:var(--sub)}
-.card-value{margin-top:6px; font-size:var(--fs-20); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.card-value{
+  margin-top:6px; font-size:var(--fs-20); font-weight:800;
+  font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
 
-/* Panels */
+/* ===== Panels ===== */
 .panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-12); padding:12px}
 .panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
 .search-inline input{width:220px}
 
-/* Tablas (estables) */
+/* ===== Tablas (estables) ===== */
 .table-wrapper{overflow:auto; border-radius:var(--r-8); border:1px solid var(--border)}
 table{
   width:100%; border-collapse:collapse; min-width:820px;
-  table-layout:fixed; /* CLAVE: usa anchos definidos, no el contenido */
+  table-layout:fixed; /* usa anchos definidos, no el contenido */
 }
 thead th{
   position:sticky; top:0; background:#0f1620; color:var(--sub);
@@ -83,13 +89,12 @@ tbody tr:hover{background:#0e141c}
 .table-10 tbody tr:nth-child(n+11){display:none}
 .badge{padding:2px 6px; border-radius:999px; border:1px solid var(--border); font-size:var(--fs-12); color:var(--sub)}
 
-/* Números: prolijos y jamás empujan */
 td.num, th.num{
   text-align:right; font-variant-numeric:tabular-nums;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-/* Fallback de ANCHOS por columna con variables (si NO hay <colgroup>) */
+/* Fallback de anchos por columna (si NO hay <colgroup>) */
 #tbl-heads th:nth-child(1){width:var(--w-fecha)}
 #tbl-heads th:nth-child(2){width:var(--w-id)}
 #tbl-heads th:nth-child(3){width:var(--w-comp)}
@@ -102,7 +107,7 @@ td.num, th.num{
 #tbl-heads th:nth-child(10){width:var(--w-marg)}
 #tbl-heads th:nth-child(11){width:var(--w-pct)}
 
-/* Si agregás <colgroup> al HTML, podés usar ch % o ch por dígitos */
+/* Soporte cuando sí hay <colgroup> */
 #tbl-heads col.c-fecha  {width:var(--w-fecha)}
 #tbl-heads col.c-id     {width:var(--w-id)}
 #tbl-heads col.c-comp   {width:var(--w-comp)}
@@ -112,14 +117,13 @@ td.num, th.num{
 #tbl-heads col.c-items  {width:var(--w-items)}
 #tbl-heads col.c-ing,
 #tbl-heads col.c-cost,
-#tbl-heads col.c-marg   {width:10ch}  /* ≈ 10 dígitos compactos */
+#tbl-heads col.c-marg   {width:10ch}  /* ≈ 10 dígitos */
 #tbl-heads col.c-pct    {width:6ch}
 
-/* Filas clickables */
 #tbl-heads tbody tr.clickable{cursor:pointer}
 #tbl-heads tbody tr.clickable:hover{background:#101827}
 
-/* Tabs alineadas */
+/* ===== Tabs ===== */
 .tabs .tabs-header{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px}
 .tabs .tabs-left{display:flex; flex-wrap:wrap; align-items:center; gap:8px}
 .tab{
@@ -135,15 +139,13 @@ td.num, th.num{
 .tabs .tabs-right label{display:inline-flex; align-items:center; gap:6px; margin:0; font-size:var(--fs-12); color:var(--sub)}
 .tabs .tabs-right select{height:36px; padding:0 8px; line-height:1; appearance:auto; -webkit-appearance:menulist; -moz-appearance:menulist}
 
-/* Gráfico + tabla */
+/* ===== Gráfico + tabla ===== */
 .two{display:grid; grid-template-columns:360px 1fr; gap:12px}
 .two > div:first-child{min-width:0}
-
-/* Charts: no rompen el layout */
 canvas{max-width:100%; display:block}
 .chart-box{min-height:160px; overflow:hidden}
 
-/* Paginación por bloques */
+/* ===== Paginación ===== */
 .pagination{
   display:flex; align-items:center; gap:8px; justify-content:center; padding-top:10px;
   flex-wrap:wrap;
@@ -154,30 +156,59 @@ canvas{max-width:100%; display:block}
 }
 .pagination button.active{background:var(--gold-soft); color:#1a1405; border-color:var(--gold-dark)}
 
-/* Drawer */
+/* ===== Drawer ===== */
 #drawer{
-  position:fixed; top:0; right:-560px; width:640px; height:100%;
+  position:fixed; top:0; right:calc(-1 * var(--drawer-w)); width:var(--drawer-w); height:100%;
   background:#0f1620; border-left:2px solid var(--gold-soft);
   box-shadow:-8px 0 24px rgba(0,0,0,.35);
   transition:right .25s ease; z-index:30; display:grid; grid-template-rows:auto 1fr;
+  overflow:hidden; /* que no aparezcan scrolls del wrapper */
 }
 #drawer.open{right:0}
 .drawer-header{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border)}
-.drawer-body{padding:12px; display:grid; gap:10px}
+.drawer-body{padding:12px; display:grid; gap:10px; overflow:hidden}
 .meta{display:grid; gap:6px; color:var(--sub); font-size:13px}
 #dw-close{background:transparent; border:1px solid var(--border); color:var(--text); border-radius:var(--r-8); padding:6px 10px; cursor:pointer}
 #dw-close:hover{border-color:var(--gold); color:var(--gold)}
 #overlay{position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:25}
 #overlay.open{opacity:1; pointer-events:auto}
 
-/* Estados */
+/* Drawer: tablas con scroll horizontal real */
+#drawer .table-wrapper{
+  display:block;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable both-edges;
+}
+#dw-table, #dw-res-table{
+  min-width:1100px;   /* fuerza barra horizontal si no entra */
+  table-layout:fixed;
+}
+/* Anchos sugeridos DW-Items */
+#dw-table th:nth-child(1){ width:36% } /* Artículo */
+#dw-table th:nth-child(2){ width:8%  } /* Cant.    */
+#dw-table th:nth-child(3){ width:12% } /* Precio   */
+#dw-table th:nth-child(4){ width:14% } /* Importe  */
+#dw-table th:nth-child(5){ width:14% } /* Costo    */
+#dw-table th:nth-child(6){ width:14% } /* Margen   */
+#dw-table th:nth-child(7){ width:8%  } /* %        */
+/* Números prolijos también en el drawer */
+#dw-table td.num, #dw-table th.num,
+#dw-res-table td.num, #dw-res-table th.num{
+  text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ===== Estados ===== */
 .ok{color:var(--good-strong)} .ok2{color:var(--good)}
 .warn{color:var(--warn2)} .warn2{color:var(--warn)} .bad{color:var(--bad)}
 
-/* Footer */
+/* ===== Footer ===== */
 .foot{padding:12px 16px; color:var(--sub); border-top:1px solid var(--border)}
 
-/* Scrollbars (WebKit) */
+/* ===== Scrollbars (WebKit) ===== */
 .table-wrapper::-webkit-scrollbar,
 body::-webkit-scrollbar{height:10px; width:10px}
 .table-wrapper::-webkit-scrollbar-track,
@@ -187,7 +218,7 @@ body::-webkit-scrollbar-thumb{background:#1d2632; border-radius:8px; border:2px 
 .table-wrapper::-webkit-scrollbar-thumb:hover,
 body::-webkit-scrollbar-thumb:hover{background:#253041}
 
-/* Responsive */
+/* ===== Responsive ===== */
 @media (max-width:1200px){
   .cards-6{grid-template-columns:repeat(3,1fr)}
   .two{grid-template-columns:1fr}
@@ -195,40 +226,10 @@ body::-webkit-scrollbar-thumb:hover{background:#253041}
 @media (max-width:700px){
   .cards-6{grid-template-columns:1fr}
   .search-inline input{width:100%}
+  :root{ --drawer-w: 92vw; } /* drawer más angosto en móviles */
 }
 
-/* Motion */
+/* ===== Motion ===== */
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important}
-}
-
-
-/* ===== Drawer: tablas scrolleables y anchos cómodos ===== */
-.drawer-body { overflow:hidden } /* no tapes el scroll del contenedor hijo */
-.drawer-body .table-wrapper{
-  overflow:auto;                /* habilita scroll horizontal si no entra */
-  overscroll-behavior: contain; /* evita “rebotar” la página al scrollear */
-}
-
-/* Las tablas del drawer son más angostas que la tabla grande,
-   así que les damos un min-width propio para permitir scroll X */
-#dw-table, #dw-res-table{
-  min-width: 720px;             /* forzamos que haya scroll si no entra */
-  table-layout: fixed;          /* columnas estables */
-}
-
-/* Anchos sugeridos para DW-Items (tuning fino sin adivinar a ojo) */
-#dw-table th:nth-child(1){ width:36% } /* Artículo */
-#dw-table th:nth-child(2){ width:8% }  /* Cant.    */
-#dw-table th:nth-child(3){ width:12% } /* Precio   */
-#dw-table th:nth-child(4){ width:14% } /* Importe  */
-#dw-table th:nth-child(5){ width:14% } /* Costo    */
-#dw-table th:nth-child(6){ width:14% } /* Margen   */
-#dw-table th:nth-child(7){ width:8% }  /* %        */
-
-/* Aseguramos formato numérico consistente dentro del drawer también */
-#dw-table td.num, #dw-table th.num,
-#dw-res-table td.num, #dw-res-table th.num{
-  text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  font-variant-numeric: tabular-nums;
 }
