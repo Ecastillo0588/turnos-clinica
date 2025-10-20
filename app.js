@@ -490,6 +490,13 @@ function openDrawer(h){
   overlay.classList.add('open');
 }
 
+/* ===== Drawer helpers (definir esto antes de bindUI) ===== */
+function closeDrawer(){
+  if (typeof drawer !== 'undefined' && drawer) drawer.classList.remove('open');
+  if (typeof overlay !== 'undefined' && overlay) overlay.classList.remove('open');
+}
+
+
 
 /* ======== Export ======== */
 function exportCSV(){
