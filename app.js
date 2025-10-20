@@ -379,9 +379,9 @@ function renderHeads(searchTerm = '', filteredRows = null){
       <td>${esc(h.vendedor)}</td>
       <td>${esc(h.sucursal)}</td>
       <td class="num">${int(h.items)}</td>
-      <td class="num">${money(h.ingreso)}</td>
-      <td class="num">${money(h.costo)}</td>
-      <td class="num">${money(h.margen)}</td>
+       <td class="num" title="${money(h.ingreso)}">${moneyCompact(h.ingreso)}</td>
+      <td class="num" title="${money(h.costo)}">${moneyCompact(h.costo)}</td>
+      <td class="num" title="${money(h.margen)}">${moneyCompact(h.margen)}</td>
       <td class="${mclass(h.pct)}">${pct(h.pct)}</td>`;
     tr.addEventListener('click', ()=>openDrawer(h));
     tblHeads.appendChild(tr);
