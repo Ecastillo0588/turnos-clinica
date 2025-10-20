@@ -10,10 +10,16 @@
 <body>
   <header class="appbar">
     <div class="appbar-title">Panel de Ventas</div>
+
     <div class="filters">
       <div class="row">
-        <label>Desde <input type="date" id="f-desde"></label>
-        <label>Hasta <input type="date" id="f-hasta"></label>
+        <label>Desde
+          <input type="date" id="f-desde" />
+        </label>
+
+        <label>Hasta
+          <input type="date" id="f-hasta" />
+        </label>
 
         <label>Vendedor
           <select id="f-vendedor" multiple></select>
@@ -27,8 +33,8 @@
           <select id="f-sucursal" multiple></select>
         </label>
 
-        <label># Presupuesto
-          <input id="f-id" placeholder="Buscar ID exacto" />
+        <label># Presupuesto (ID exacto)
+          <input id="f-id" placeholder="Ej: 00012345" />
         </label>
 
         <div class="actions">
@@ -63,7 +69,7 @@
         </div>
         <div class="tabs-right">
           <label>Top
-            <select id="topN">
+            <select id="topN" aria-label="Cantidad de barras Top N">
               <option>5</option>
               <option selected>10</option>
               <option>15</option>
@@ -77,11 +83,18 @@
         <!-- Vendedores -->
         <div class="tab-pane active" id="pane-vend">
           <div class="two">
-            <div><canvas id="chartVend" height="160"></canvas></div>
+            <div class="chart-box"><canvas id="chartVend"></canvas></div>
             <div class="table-wrapper">
               <table id="tbl-vend" data-kind="vendedor" class="table-10">
                 <thead>
-                  <tr><th>Vendedor</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr>
+                  <tr>
+                    <th>Vendedor</th>
+                    <th class="num">Presu</th>
+                    <th class="num">Ítems</th>
+                    <th class="num">Ingreso</th>
+                    <th class="num">Margen</th>
+                    <th>%</th>
+                  </tr>
                 </thead>
                 <tbody></tbody>
               </table>
@@ -92,11 +105,18 @@
         <!-- Clientes -->
         <div class="tab-pane" id="pane-cli">
           <div class="two">
-            <div><canvas id="chartCli" height="160"></canvas></div>
+            <div class="chart-box"><canvas id="chartCli"></canvas></div>
             <div class="table-wrapper">
               <table id="tbl-cli" data-kind="cliente" class="table-10">
                 <thead>
-                  <tr><th>Cliente</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr>
+                  <tr>
+                    <th>Cliente</th>
+                    <th class="num">Presu</th>
+                    <th class="num">Ítems</th>
+                    <th class="num">Ingreso</th>
+                    <th class="num">Margen</th>
+                    <th>%</th>
+                  </tr>
                 </thead>
                 <tbody></tbody>
               </table>
@@ -107,11 +127,18 @@
         <!-- Sucursales -->
         <div class="tab-pane" id="pane-suc">
           <div class="two">
-            <div><canvas id="chartSuc" height="160"></canvas></div>
+            <div class="chart-box"><canvas id="chartSuc"></canvas></div>
             <div class="table-wrapper">
               <table id="tbl-suc" data-kind="sucursal" class="table-10">
                 <thead>
-                  <tr><th>Sucursal</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr>
+                  <tr>
+                    <th>Sucursal</th>
+                    <th class="num">Presu</th>
+                    <th class="num">Ítems</th>
+                    <th class="num">Ingreso</th>
+                    <th class="num">Margen</th>
+                    <th>%</th>
+                  </tr>
                 </thead>
                 <tbody></tbody>
               </table>
@@ -127,11 +154,27 @@
       <div class="panel-head">
         <h2>Presupuestos</h2>
         <div class="search-inline">
-          <input id="q-id" placeholder="Buscar ID (exacto)" />
+          <input id="q-id" placeholder="Buscar comprobante o ID" aria-label="Buscar comprobante o ID" />
         </div>
       </div>
+
       <div class="table-wrapper">
         <table id="tbl-heads">
+          <!-- Colgroup = una sola fuente de verdad para anchos -->
+          <colgroup>
+            <col class="c-fecha" />
+            <col class="c-id" />
+            <col class="c-comp" />
+            <col class="c-cliente" />
+            <col class="c-vend" />
+            <col class="c-suc" />
+            <col class="c-items" />
+            <col class="c-ing" />
+            <col class="c-cost" />
+            <col class="c-marg" />
+            <col class="c-pct" />
+          </colgroup>
+
           <thead>
             <tr>
               <th>Fecha</th>
@@ -140,16 +183,17 @@
               <th>Cliente</th>
               <th>Vendedor</th>
               <th>Sucursal</th>
-              <th>Ítems</th>
-              <th>Ingreso</th>
-              <th>Costo</th>
-              <th>Margen</th>
+              <th class="num">Ítems</th>
+              <th class="num">Ingreso</th>
+              <th class="num">Costo</th>
+              <th class="num">Margen</th>
               <th>%</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
+
       <div class="pagination" id="pg-heads"></div>
     </section>
 
@@ -159,7 +203,7 @@
         <h2>Artículos destacados</h2>
         <div class="toolbar">
           <label>Top
-            <select id="top-art">
+            <select id="top-art" aria-label="Top artículos">
               <option>5</option>
               <option selected>10</option>
               <option>15</option>
@@ -168,16 +212,17 @@
           </label>
         </div>
       </div>
+
       <div class="table-wrapper">
         <table id="tbl-art" class="table-10">
           <thead>
             <tr>
               <th>Artículo</th>
-              <th>Ítems</th>
-              <th>Cantidad</th>
-              <th>Ingreso</th>
-              <th>Precio prom.</th>
-              <th>Margen</th>
+              <th class="num">Ítems</th>
+              <th class="num">Cantidad</th>
+              <th class="num">Ingreso</th>
+              <th class="num">Precio prom.</th>
+              <th class="num">Margen</th>
               <th>%</th>
             </tr>
           </thead>
@@ -188,11 +233,12 @@
   </main>
 
   <!-- Drawer (sidebar de presupuesto) -->
-  <aside id="drawer">
+  <aside id="drawer" aria-hidden="true">
     <div class="drawer-header">
       <div class="drawer-title" id="dw-title">Presupuesto</div>
       <button id="dw-close" aria-label="Cerrar">✕</button>
     </div>
+
     <div class="drawer-body">
       <div id="dw-meta" class="meta"></div>
 
@@ -201,14 +247,15 @@
           <button class="tab active" data-tab="dw-items">Ítems</button>
           <button class="tab" data-tab="dw-res">Resumen</button>
         </div>
+
         <div class="tabs-body">
           <div class="tab-pane active" id="pane-dw-items">
             <div class="table-wrapper">
               <table id="dw-table">
                 <thead>
                   <tr>
-                    <th>Artículo</th><th>Cant.</th><th>Precio</th>
-                    <th>Importe</th><th>Costo</th><th>Margen</th><th>%</th>
+                    <th>Artículo</th><th class="num">Cant.</th><th class="num">Precio</th>
+                    <th class="num">Importe</th><th class="num">Costo</th><th class="num">Margen</th><th>%</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -221,8 +268,8 @@
               <table id="dw-res-table">
                 <thead>
                   <tr>
-                    <th>Grupo</th><th>Clave</th><th>Ítems</th>
-                    <th>Ingreso</th><th>Costo</th><th>Margen</th><th>%</th>
+                    <th>Grupo</th><th>Clave</th><th class="num">Ítems</th>
+                    <th class="num">Ingreso</th><th class="num">Costo</th><th class="num">Margen</th><th>%</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -239,6 +286,7 @@
   <div id="overlay"></div>
 
   <footer class="foot"><span id="status">Listo.</span></footer>
+
   <script src="./app.js"></script>
 </body>
 </html>
