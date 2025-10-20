@@ -10,9 +10,9 @@
   --r-8:8px; --r-12:12px; --shadow-1:0 6px 18px rgba(0,0,0,.25);
 
   /* Drawer */
-  --drawer-w: 640px; /* ← cambiá el ancho del sidebar acá */
+  --drawer-w: 640px; /* ← ancho del sidebar */
 
-  /* Anchos de columnas (fallback si no hay <colgroup>) */
+  /* Anchos fallback (si no hay <colgroup>) */
   --w-fecha:10%; --w-id:9%; --w-comp:14%; --w-cliente:17%;
   --w-vend:14%; --w-suc:12%; --w-items:6%;
   --w-ing:8%; --w-cost:8%; --w-marg:8%; --w-pct:4%;
@@ -117,7 +117,7 @@ td.num, th.num{
 #tbl-heads col.c-items  {width:var(--w-items)}
 #tbl-heads col.c-ing,
 #tbl-heads col.c-cost,
-#tbl-heads col.c-marg   {width:10ch}  /* ≈ 10 dígitos */
+#tbl-heads col.c-marg   {width:10ch}
 #tbl-heads col.c-pct    {width:6ch}
 
 #tbl-heads tbody tr.clickable{cursor:pointer}
@@ -173,31 +173,6 @@ canvas{max-width:100%; display:block}
 #overlay{position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:25}
 #overlay.open{opacity:1; pointer-events:auto}
 
-/* Drawer: tablas con scroll horizontal real */
-#drawer .table-wrapper{
-  display:block;
-  width:100%;                /* ← clave: ocupa el ancho del drawer */
-  overflow-x:auto;           /* ← permite scroll horizontal */
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-gutter:stable both-edges;
-}
-#dw-table, #dw-res-table{
-  width:max-content;         /* ← se expande al contenido */
-  min-width:1200px;          /* asegura overflow en drawers angostos */
-  table-layout:fixed;
-  white-space:nowrap;        /* evita que se partan celdas y “achiquen” la tabla */
-}
-/* Evita que los panes del drawer fuercen un ancho mayor al contenedor */
-#drawer .tabs .tab-pane{ min-width:0; }
-
-/* Números prolijos también en el drawer */
-#dw-table td.num, #dw-table th.num,
-#dw-res-table td.num, #dw-res-table th.num{
-  text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  font-variant-numeric:tabular-nums;
-}
-
 /* ===== Estados ===== */
 .ok{color:var(--good-strong)} .ok2{color:var(--good)}
 .warn{color:var(--warn2)} .warn2{color:var(--warn)} .bad{color:var(--bad)}
@@ -241,51 +216,37 @@ body::-webkit-scrollbar-thumb:hover{background:#253041}
   .meta-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
 
-/* 1) Dejá que las capas del drawer puedan encogerse horizontalmente */
+/* === Drawer: overflow horizontal estable (DEJAR AL FINAL) === */
+
+/* 1) Capas del drawer pueden encogerse dentro del grid */
 #drawer .drawer-body,
 #drawer .tabs,
 #drawer .tabs .tabs-body,
-#drawer .tabs .tab-pane{
-  min-width: 0;           /* ← clave para que aparezca el overflow horizontal */
+#drawer .tabs .tab-pane {
+  min-width: 0;
 }
 
-/* 2) Asegurá sólo scroll horizontal en los wrappers del drawer (opcional) */
-#drawer .table-wrapper{
-  overflow-x: auto;
-  overflow-y: hidden;     /* evita doble scroll vertical dentro del drawer */
-}
-
-/* 3) Por si el grid padre corta el scroll (algunas versiones de WebKit) */
-#drawer .tabs .tab-pane .table-wrapper{
-  display: block;         /* fuerza bloque independiente del grid */
-  max-width: 100%;        /* explícito, junto a tu width:100% */
-}
-
-/* 4) Si tu OS oculta barras, “obligá” el espacio de la barra (cosmético) */
-#drawer .table-wrapper{ scrollbar-gutter: stable both-edges; }
-
-
-/* Permitir encoger todas las capas del drawer en layout grid */
-#drawer .drawer-body,
-#drawer .tabs,
-#drawer .tabs .tabs-body,
-#drawer .tabs .tab-pane { min-width: 0; }
-
-/* Wrapper del drawer: scroll horizontal real */
+/* 2) Wrapper con scroll horizontal real */
 #drawer .table-wrapper {
   display: block;
   width: 100%;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: hidden;               /* evita doble scroll vertical */
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable both-edges;
 }
 
-/* 🛡️ Aumentar especificidad para ganar a table{width:100%} */
+/* 3) Por si el grid corta el bloque en algunos WebKit */
+#drawer .tabs .tab-pane .table-wrapper {
+  display: block;
+  max-width: 100%;
+}
+
+/* 4) La tabla del drawer mide su contenido (gana a table{width:100%}) */
 #drawer table#dw-table,
 #drawer table#dw-res-table {
-  width: max-content !important;   /* fuerza que la tabla mida el contenido */
-  min-width: 1200px;               /* asegura overflow */
+  width: max-content !important;
+  min-width: 1200px;                /* ajustá si querés menos/más ancho base */
   table-layout: fixed;
   white-space: nowrap;
 }
