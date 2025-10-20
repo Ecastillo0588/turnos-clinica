@@ -14,27 +14,36 @@
       <div class="row">
         <label>Desde <input type="date" id="f-desde"></label>
         <label>Hasta <input type="date" id="f-hasta"></label>
+
         <label>Vendedor
           <select id="f-vendedor" multiple></select>
         </label>
+
         <label>Cliente
           <select id="f-cliente" multiple></select>
         </label>
+
         <label>Sucursal
           <select id="f-sucursal" multiple></select>
         </label>
-        <label># Presupuesto <input id="f-id" placeholder="Buscar ID exacto" /></label>
+
+        <label># Presupuesto
+          <input id="f-id" placeholder="Buscar ID exacto" />
+        </label>
+
         <div class="actions">
           <button id="btn-apply">Aplicar</button>
           <button id="btn-clear" class="ghost">Limpiar</button>
           <button id="btn-csv" class="ghost" disabled>Exportar CSV</button>
         </div>
       </div>
+
       <div id="active-filters" class="active-filters"></div>
     </div>
   </header>
 
   <main class="container">
+    <!-- KPIs -->
     <section class="cards cards-6">
       <div class="card"><div class="card-title">Ingresos</div><div class="card-value" id="k-ingresos">$0</div></div>
       <div class="card"><div class="card-title">Costos</div><div class="card-value" id="k-costos">$0</div></div>
@@ -44,6 +53,7 @@
       <div class="card"><div class="card-title">Ticket prom.</div><div class="card-value" id="k-ticket">$0</div></div>
     </section>
 
+    <!-- Tabs de distribución -->
     <section class="tabs panel">
       <div class="tabs-header">
         <div class="tabs-left">
@@ -54,48 +64,65 @@
         <div class="tabs-right">
           <label>Top
             <select id="topN">
-              <option>5</option><option selected>10</option><option>15</option><option>20</option>
+              <option>5</option>
+              <option selected>10</option>
+              <option>15</option>
+              <option>20</option>
             </select>
           </label>
         </div>
       </div>
+
       <div class="tabs-body">
+        <!-- Vendedores -->
         <div class="tab-pane active" id="pane-vend">
           <div class="two">
             <div><canvas id="chartVend" height="160"></canvas></div>
             <div class="table-wrapper">
               <table id="tbl-vend" data-kind="vendedor" class="table-10">
-                <thead><tr><th>Vendedor</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr></thead>
+                <thead>
+                  <tr><th>Vendedor</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr>
+                </thead>
                 <tbody></tbody>
               </table>
             </div>
           </div>
         </div>
+
+        <!-- Clientes -->
         <div class="tab-pane" id="pane-cli">
           <div class="two">
             <div><canvas id="chartCli" height="160"></canvas></div>
             <div class="table-wrapper">
               <table id="tbl-cli" data-kind="cliente" class="table-10">
-                <thead><tr><th>Cliente</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr></thead>
+                <thead>
+                  <tr><th>Cliente</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr>
+                </thead>
                 <tbody></tbody>
               </table>
             </div>
           </div>
         </div>
+
+        <!-- Sucursales -->
         <div class="tab-pane" id="pane-suc">
           <div class="two">
             <div><canvas id="chartSuc" height="160"></canvas></div>
             <div class="table-wrapper">
               <table id="tbl-suc" data-kind="sucursal" class="table-10">
-                <thead><tr><th>Sucursal</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr></thead>
+                <thead>
+                  <tr><th>Sucursal</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr>
+                </thead>
                 <tbody></tbody>
               </table>
             </div>
           </div>
         </div>
+
       </div>
     </section>
 
+    <!-- Presupuestos (cabeceras) -->
     <section class="panel">
       <div class="panel-head">
         <h2>Presupuestos</h2>
@@ -107,9 +134,17 @@
         <table id="tbl-heads">
           <thead>
             <tr>
-              <th>Fecha</th><th>ID</th><th>Comprobante</th><th>Cliente</th>
-              <th>Vendedor</th><th>Sucursal</th><th>Ítems</th>
-              <th>Ingreso</th><th>Costo</th><th>Margen</th><th>%</th>
+              <th>Fecha</th>
+              <th>ID</th>
+              <th>Comprobante</th>
+              <th>Cliente</th>
+              <th>Vendedor</th>
+              <th>Sucursal</th>
+              <th>Ítems</th>
+              <th>Ingreso</th>
+              <th>Costo</th>
+              <th>Margen</th>
+              <th>%</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -118,16 +153,49 @@
       <div class="pagination" id="pg-heads"></div>
     </section>
 
+    <!-- Artículos destacados -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Artículos destacados</h2>
+        <div class="toolbar">
+          <label>Top
+            <select id="top-art">
+              <option>5</option>
+              <option selected>10</option>
+              <option>15</option>
+              <option>20</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="tbl-art" class="table-10">
+          <thead>
+            <tr>
+              <th>Artículo</th>
+              <th>Ítems</th>
+              <th>Cantidad</th>
+              <th>Ingreso</th>
+              <th>Precio prom.</th>
+              <th>Margen</th>
+              <th>%</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
+  <!-- Drawer (sidebar de presupuesto) -->
   <aside id="drawer">
     <div class="drawer-header">
       <div class="drawer-title" id="dw-title">Presupuesto</div>
       <button id="dw-close" aria-label="Cerrar">✕</button>
     </div>
-    <div id="overlay"></div>
     <div class="drawer-body">
       <div id="dw-meta" class="meta"></div>
+
       <div class="tabs small">
         <div class="tabs-header">
           <button class="tab active" data-tab="dw-items">Ítems</button>
@@ -138,54 +206,37 @@
             <div class="table-wrapper">
               <table id="dw-table">
                 <thead>
-                  <tr><th>Artículo</th><th>Cant.</th><th>Precio</th><th>Importe</th><th>Costo</th><th>Margen</th><th>%</th></tr>
+                  <tr>
+                    <th>Artículo</th><th>Cant.</th><th>Precio</th>
+                    <th>Importe</th><th>Costo</th><th>Margen</th><th>%</th>
+                  </tr>
                 </thead>
                 <tbody></tbody>
               </table>
             </div>
           </div>
+
           <div class="tab-pane" id="pane-dw-res">
             <div class="table-wrapper">
               <table id="dw-res-table">
-                <thead><tr><th>Grupo</th><th>Clave</th><th>Ítems</th><th>Ingreso</th><th>Costo</th><th>Margen</th><th>%</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>Grupo</th><th>Clave</th><th>Ítems</th>
+                    <th>Ingreso</th><th>Costo</th><th>Margen</th><th>%</th>
+                  </tr>
+                </thead>
                 <tbody></tbody>
               </table>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </aside>
 
-  <section class="panel">
-  <div class="panel-head">
-    <h2>Artículos destacados</h2>
-    <div class="toolbar">
-      <label>Top
-        <select id="top-art">
-          <option>5</option><option selected>10</option><option>15</option><option>20</option>
-        </select>
-      </label>
-    </div>
-  </div>
-  <div class="table-wrapper">
-    <table id="tbl-art" class="table-10">
-      <thead>
-        <tr>
-          <th>Artículo</th>
-          <th>Ítems</th>
-          <th>Cantidad</th>
-          <th>Ingreso</th>
-          <th>Precio prom.</th>
-          <th>Margen</th>
-          <th>%</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</section>
-
+  <!-- Overlay para cerrar el drawer con clic afuera -->
+  <div id="overlay"></div>
 
   <footer class="foot"><span id="status">Listo.</span></footer>
   <script src="./app.js"></script>
