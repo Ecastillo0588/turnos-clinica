@@ -58,7 +58,6 @@ tbody tr:hover{background:#0e141c}
 #drawer{position:fixed;top:0;right:-560px;width:560px;height:100%;background:#0f1620;border-left:2px solid var(--gold-soft);box-shadow:-8px 0 24px rgba(0,0,0,.35);transition:right .25s ease;z-index:30;display:grid;grid-template-rows:auto 1fr}
 #drawer.open{right:0}
 .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
-#dw-close{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px}
 .drawer-body{padding:12px;display:grid;gap:10px}
 .meta{display:grid;gap:6px;color:var(--sub);font-size:13px}
 
@@ -69,3 +68,23 @@ tbody tr:hover{background:#0e141c}
 
 @media (max-width:1200px){.cards-6{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}}
 @media (max-width:700px){.cards-6{grid-template-columns:1fr}}
+/* Botón cerrar en el sidebar: que se vea y tenga contraste */
+#dw-close{
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+#dw-close:hover{ border-color: var(--gold); color: var(--gold); }
+
+/* Overlay para cerrar con clic afuera */
+#overlay{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.35);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 25; /* debajo del drawer (z=30) */
+}
+#overlay.open{ opacity: 1; pointer-events: auto; }
