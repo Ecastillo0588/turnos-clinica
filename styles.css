@@ -109,17 +109,18 @@ td.num, th.num{ text-align:right; font-variant-numeric: tabular-nums }
 #tbl-heads tbody tr.clickable:hover{background:#101827}
 
 /* Anchos sugeridos por columna para #tbl-heads (estable) */
-#tbl-heads th:nth-child(1){width:9%}   /* Fecha */
-#tbl-heads th:nth-child(2){width:8%}   /* ID */
-#tbl-heads th:nth-child(3){width:12%}  /* Comprobante */
-#tbl-heads th:nth-child(4){width:16%}  /* Cliente */
+#tbl-heads th:nth-child(1){width:10%}  /* Fecha   */
+#tbl-heads th:nth-child(2){width:9%}   /* ID      */
+#tbl-heads th:nth-child(3){width:14%}  /* Comprobante */
+#tbl-heads th:nth-child(4){width:17%}  /* Cliente */
 #tbl-heads th:nth-child(5){width:14%}  /* Vendedor */
-#tbl-heads th:nth-child(6){width:14%}  /* Sucursal */
-#tbl-heads th:nth-child(7){width:7%}   /* Ítems */
-#tbl-heads th:nth-child(8),
-#tbl-heads th:nth-child(9),
-#tbl-heads th:nth-child(10),
-#tbl-heads th:nth-child(11){width:5%}  /* $ columnas */
+#tbl-heads th:nth-child(6){width:12%}  /* Sucursal */
+#tbl-heads th:nth-child(7){width:6%}   /* Ítems   */
+#tbl-heads th:nth-child(8){width:8%}   /* Ingreso */
+#tbl-heads th:nth-child(9){width:8%}   /* Costo   */
+#tbl-heads th:nth-child(10){width:8%}  /* Margen  */
+#tbl-heads th:nth-child(11){width:4%}  /* %       */
+
 
 /* ===== Tabs ===== */
 .tabs .tabs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -216,4 +217,14 @@ body::-webkit-scrollbar-thumb:hover{background:#253041}
 /* ===== Motion preferences ===== */
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important}
+}
+
+
+/* Las celdas numéricas nunca desbordan visualmente */
+td.num, th.num{
+  text-align:right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
