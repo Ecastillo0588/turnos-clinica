@@ -447,12 +447,16 @@ function renderHeads(searchTerm = '', filteredRows = null){
 
 
 function openDrawer(h){
-  dwTitle.textContent = `Presupuesto ${h.id} · ${fmtDate(h.fecha)}`;
-  dwMeta.innerHTML = `
+  dwTitle.textContent = `Presupuesto ${h.comprobante || h.id} · ${fmtDate(h.fecha)}`;
+dwMeta.innerHTML = `
+  <div class="meta-grid">
     <div><b>Cliente:</b> ${esc(h.cliente)}</div>
     <div><b>Vendedor:</b> ${esc(h.vendedor)}</div>
     <div><b>Sucursal:</b> ${esc(h.sucursal)}</div>
-    <div><b>Ingreso:</b> ${money(h.ingreso)} · <b>Costo:</b> ${money(h.costo)} · <b>Margen:</b> ${money(h.margen)} <span class="${mclass(h.pct)}">(${pct(h.pct)})</span></div>`;
+    <div><b>Ingreso:</b> ${money(h.ingreso)}</div>
+    <div><b>Costo:</b> ${money(h.costo)}</div>
+    <div><b>Margen:</b> ${money(h.margen)} <span class="${mclass(h.pct)}">(${pct(h.pct)})</span></div>
+  </div>`;
 
   // Ítems (con margen por ítem y %)
   dwBody.innerHTML = '';
