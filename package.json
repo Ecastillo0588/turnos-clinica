@@ -1,8 +1,0 @@
-{
-  "name": "turnos-clinica",
-  "type": "module",
-  "engines": { "node": "22.x" },
-  "scripts": {
-    "build": "echo \"no build needed\""
-  }
-}
