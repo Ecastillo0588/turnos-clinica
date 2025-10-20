@@ -21,7 +21,7 @@ html,body{height:100%}
 body{
   margin:0;background:var(--bg);color:var(--text);
   font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-  line-height:1.45
+  line-height:1.45;
 }
 
 /* ===== Topbar & Filtros ===== */
@@ -29,7 +29,7 @@ body{
   position:sticky;top:0;z-index:20;
   background:linear-gradient(180deg,#121820,rgba(18,24,32,.9));
   border-bottom:1px solid var(--border);
-  backdrop-filter:saturate(120%) blur(4px)
+  backdrop-filter:saturate(120%) blur(4px);
 }
 .appbar-title{padding:10px 16px;font-weight:700}
 .filters{padding:8px 16px;display:grid;gap:10px}
@@ -37,7 +37,7 @@ body{
 label{display:grid;gap:4px;font-size:var(--fs-12);color:var(--sub)}
 input,select{
   background:var(--surface);border:1px solid var(--border);color:var(--text);
-  padding:8px 10px;border-radius:var(--r-8);min-height:36px;outline:none
+  padding:8px 10px;border-radius:var(--r-8);min-height:36px;outline:none;
 }
 input::placeholder{color:#8797aa}
 select[multiple]{min-width:180px;min-height:36px}
@@ -45,7 +45,7 @@ select[multiple]{min-width:180px;min-height:36px}
 button{
   background:var(--gold);border:0;color:#1a1405;font-weight:700;
   border-radius:var(--r-8);padding:10px 14px;cursor:pointer;
-  transition:transform .06s ease
+  transition:transform .06s ease;
 }
 button:hover{background:var(--gold-hover)}
 button:active{transform:translateY(1px)}
@@ -55,19 +55,7 @@ button.ghost:hover{border-color:var(--gold);color:var(--gold)}
 :where(button,input,select){outline:none}
 :where(button,input,select):focus-visible{
   box-shadow:0 0 0 2px rgba(217,164,65,.35),0 0 0 4px rgba(217,164,65,.15);
-  border-color:var(--gold)
-}
-
-.chips{display:flex;gap:8px;align-items:center}
-.chip{display:flex;gap:6px;align-items:center;background:transparent;border:1px solid var(--border);padding:6px 8px;border-radius:999px}
-.active-filters{display:flex;flex-wrap:wrap;gap:6px}
-.active-filters .af{
-  font-size:var(--fs-12);color:#0b0b0b;background:var(--gold-soft);
-  border:1px solid var(--gold-dark);border-radius:999px;padding:4px 8px;
-  display:inline-flex;align-items:center
-}
-.active-filters .af button{
-  margin-left:6px;background:transparent;border:0;color:#3b2b05;padding:0;cursor:pointer
+  border-color:var(--gold);
 }
 
 /* ===== Layout ===== */
@@ -76,7 +64,7 @@ button.ghost:hover{border-color:var(--gold);color:var(--gold)}
 .cards-6{grid-template-columns:repeat(6,1fr)}
 .card{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--r-12);padding:12px;
-  box-shadow:var(--shadow-1)
+  box-shadow:var(--shadow-1);
 }
 .card-title{font-size:var(--fs-12);color:var(--sub)}
 .card-value{margin-top:6px;font-size:var(--fs-20);font-weight:800}
@@ -94,17 +82,23 @@ table{
 }
 thead th{
   position:sticky;top:0;background:#0f1620;color:var(--sub);
-  font-size:var(--fs-12);text-align:left;padding:10px;border-bottom:1px solid var(--border);z-index:1
+  font-size:var(--fs-12);text-align:left;padding:10px;border-bottom:1px solid var(--border);z-index:1;
 }
 tbody td{padding:10px;border-bottom:1px solid #1b2430;font-size:var(--fs-14)}
 tbody tr:hover{background:#0e141c}
 .table-10 tbody tr:nth-child(n+11){display:none}
 .badge{padding:2px 6px;border-radius:999px;border:1px solid var(--border);font-size:var(--fs-12);color:var(--sub)}
 
-/* Cols numéricas */
-td.num, th.num{ text-align:right; font-variant-numeric: tabular-nums }
+/* Cols numéricas — nunca desbordan */
+td.num, th.num{
+  text-align:right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-/* Filas clickables visibles para el usuario */
+/* Filas clickables */
 #tbl-heads tbody tr.clickable{cursor:pointer}
 #tbl-heads tbody tr.clickable:hover{background:#101827}
 
@@ -121,39 +115,51 @@ td.num, th.num{ text-align:right; font-variant-numeric: tabular-nums }
 #tbl-heads th:nth-child(10){width:8%}  /* Margen  */
 #tbl-heads th:nth-child(11){width:4%}  /* %       */
 
-
 /* ===== Tabs ===== */
-.tabs .tabs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tabs .tabs-header{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;
+}
+.tabs .tabs-left{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .tab{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:36px; padding:0 10px; line-height:1;
   background:transparent;border:1px solid var(--border);color:var(--text);
-  border-radius:var(--r-8);padding:6px 10px;margin-right:6px;cursor:pointer
+  border-radius:var(--r-8);cursor:pointer;
 }
 .tab.active{background:var(--gold-soft);color:#2b1d03;border-color:var(--gold-dark)}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
 
+/* Right controls (Top) igualados a tabs */
+.tabs .tabs-right{display:flex;align-items:center;gap:8px}
+.tabs .tabs-right label{
+  display:inline-flex;align-items:center;gap:6px;margin:0;
+  font-size:var(--fs-12);color:var(--sub);
+}
+.tabs .tabs-right select{
+  height:36px; padding:0 8px; line-height:1;
+  appearance:auto; -webkit-appearance:menulist; -moz-appearance:menulist;
+}
+
 /* Dos columnas: gráfico + tabla */
 .two{display:grid;grid-template-columns:360px 1fr;gap:12px}
-.two > div:first-child{min-width:0} /* evita overflow del contenedor izquierdo */
+.two > div:first-child{min-width:0} /* evita overflow en la columna del gráfico */
 
 /* ===== Gráficos (NO romper layout) ===== */
 canvas{max-width:100%;display:block} /* el chart nunca ensancha el grid */
-.chart-box{ /* si querés, envolvé el canvas con <div class="chart-box"> */
-  min-height:160px; /* la altura real la decide JS, acá garantizamos base */
-  overflow:hidden;  /* evita que tooltips/labels estiren el contenedor */
-}
+.chart-box{min-height:160px;overflow:hidden} /* contenedor opcional para el canvas */
 
 /* ===== Paginación (bloques) ===== */
 .pagination{
   display:flex; align-items:center; gap:8px; justify-content:center; padding-top:10px;
-  flex-wrap:wrap; /* móvil: que haga wrap y no empuje el layout */
+  flex-wrap:wrap; /* móvil: wrap, no empuja layout */
 }
 .pagination button{
   background:transparent; border:1px solid var(--border); color:var(--text);
-  border-radius:var(--r-8); padding:6px 10px; min-width:36px
+  border-radius:var(--r-8); padding:6px 10px; min-width:36px;
 }
 .pagination button.active{
-  background:var(--gold-soft); color:#1a1405; border-color:var(--gold-dark)
+  background:var(--gold-soft); color:#1a1405; border-color:var(--gold-dark);
 }
 
 /* ===== Drawer ===== */
@@ -161,7 +167,7 @@ canvas{max-width:100%;display:block} /* el chart nunca ensancha el grid */
   position:fixed;top:0;right:-560px;width:560px;height:100%;
   background:#0f1620;border-left:2px solid var(--gold-soft);
   box-shadow:-8px 0 24px rgba(0,0,0,.35);
-  transition:right .25s ease;z-index:30;display:grid;grid-template-rows:auto 1fr
+  transition:right .25s ease;z-index:30;display:grid;grid-template-rows:auto 1fr;
 }
 #drawer.open{right:0}
 .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
@@ -170,21 +176,21 @@ canvas{max-width:100%;display:block} /* el chart nunca ensancha el grid */
 /* Botón cerrar */
 #dw-close{
   background: transparent;border: 1px solid var(--border);color: var(--text);
-  border-radius: var(--r-8);padding: 6px 10px;cursor: pointer
+  border-radius: var(--r-8);padding: 6px 10px;cursor: pointer;
 }
 #dw-close:hover{ border-color: var(--gold); color: var(--gold) }
 
 /* Overlay para cerrar con clic afuera */
 #overlay{
   position: fixed; inset: 0; background: rgba(0,0,0,.35);
-  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 25
+  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 25;
 }
 #overlay.open{ opacity: 1; pointer-events: auto }
 
 /* ===== KPIs ===== */
 .card-value{
   font-variant-numeric: tabular-nums;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 /* ===== Estados de margen ===== */
@@ -217,14 +223,4 @@ body::-webkit-scrollbar-thumb:hover{background:#253041}
 /* ===== Motion preferences ===== */
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important}
-}
-
-
-/* Las celdas numéricas nunca desbordan visualmente */
-td.num, th.num{
-  text-align:right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
