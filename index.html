@@ -250,12 +250,27 @@
 
         <div class="tabs-body">
           <div class="tab-pane active" id="pane-dw-items">
-            <div class="table-wrapper">
-              <table id="dw-table">
+            <!-- h-scroll habilita scroll horizontal -->
+            <div class="table-wrapper h-scroll">
+              <table id="dw-table" class="wide">
+                <colgroup>
+                  <col style="width:36%"> <!-- Artículo -->
+                  <col style="width:8%">  <!-- Cant.    -->
+                  <col style="width:12%"> <!-- Precio   -->
+                  <col style="width:14%"> <!-- Importe  -->
+                  <col style="width:14%"> <!-- Costo    -->
+                  <col style="width:14%"> <!-- Margen   -->
+                  <col style="width:8%">  <!-- %        -->
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>Artículo</th><th class="num">Cant.</th><th class="num">Precio</th>
-                    <th class="num">Importe</th><th class="num">Costo</th><th class="num">Margen</th><th>%</th>
+                    <th>Artículo</th>
+                    <th class="num">Cant.</th>
+                    <th class="num">Precio</th>
+                    <th class="num">Importe</th>
+                    <th class="num">Costo</th>
+                    <th class="num">Margen</th>
+                    <th>%</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -264,12 +279,26 @@
           </div>
 
           <div class="tab-pane" id="pane-dw-res">
-            <div class="table-wrapper">
-              <table id="dw-res-table">
+            <div class="table-wrapper h-scroll">
+              <table id="dw-res-table" class="wide">
+                <colgroup>
+                  <col style="width:16%"> <!-- Grupo -->
+                  <col style="width:24%"> <!-- Clave -->
+                  <col style="width:10%"> <!-- Ítems -->
+                  <col style="width:16%"> <!-- Ingreso -->
+                  <col style="width:16%"> <!-- Costo -->
+                  <col style="width:16%"> <!-- Margen -->
+                  <col style="width:12%"> <!-- % -->
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>Grupo</th><th>Clave</th><th class="num">Ítems</th>
-                    <th class="num">Ingreso</th><th class="num">Costo</th><th class="num">Margen</th><th>%</th>
+                    <th>Grupo</th>
+                    <th>Clave</th>
+                    <th class="num">Ítems</th>
+                    <th class="num">Ingreso</th>
+                    <th class="num">Costo</th>
+                    <th class="num">Margen</th>
+                    <th>%</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
