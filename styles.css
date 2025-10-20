@@ -263,3 +263,29 @@ body::-webkit-scrollbar-thumb:hover{background:#253041}
 
 /* 4) Si tu OS oculta barras, “obligá” el espacio de la barra (cosmético) */
 #drawer .table-wrapper{ scrollbar-gutter: stable both-edges; }
+
+
+/* Permitir encoger todas las capas del drawer en layout grid */
+#drawer .drawer-body,
+#drawer .tabs,
+#drawer .tabs .tabs-body,
+#drawer .tabs .tab-pane { min-width: 0; }
+
+/* Wrapper del drawer: scroll horizontal real */
+#drawer .table-wrapper {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable both-edges;
+}
+
+/* 🛡️ Aumentar especificidad para ganar a table{width:100%} */
+#drawer table#dw-table,
+#drawer table#dw-res-table {
+  width: max-content !important;   /* fuerza que la tabla mida el contenido */
+  min-width: 1200px;               /* asegura overflow */
+  table-layout: fixed;
+  white-space: nowrap;
+}
