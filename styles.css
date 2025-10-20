@@ -88,3 +88,30 @@ tbody tr:hover{background:#0e141c}
   z-index: 25; /* debajo del drawer (z=30) */
 }
 #overlay.open{ opacity: 1; pointer-events: auto; }
+
+/* Evitar que números largos rompan el layout */
+.card-value{
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tablas estables */
+.table-wrapper{ overflow:auto; border-radius:8px; border:1px solid var(--border) }
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:820px;
+  table-layout: fixed;           /* <— clave: columnas fijas */
+}
+thead th, tbody td{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;       /* muestra … si no entra */
+}
+td.num, th.num{
+  text-align:right;
+  font-variant-numeric: tabular-nums;
+}
+
