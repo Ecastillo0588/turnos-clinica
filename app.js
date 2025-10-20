@@ -8,7 +8,7 @@ const state = {
   from: '', to: '',
   vendedores: new Set(),
   clientes: new Set(),
-  estados: new Set(['VIGENTE','CERRADO','ANULADO']),
+  sucursales: new Set(),
   presuId: '',
   topN: 10
 };
@@ -24,13 +24,13 @@ const qId = $('#q-id');
 
 const tblVend = $('#tbl-vend tbody'), tblCli = $('#tbl-cli tbody'), tblSuc = $('#tbl-suc tbody');
 const tblHeads = $('#tbl-heads tbody'), pgHeads = $('#pg-heads');
-const tblItems = $('#tbl-items tbody'), pgItems = $('#pg-items');
 
 const drawer = $('#drawer'), dwClose = $('#dw-close');
 const dwTitle = $('#dw-title'), dwMeta = $('#dw-meta'), dwBody = $('#dw-table tbody'), dwResBody = $('#dw-res-table tbody');
+const overlay = $('#overlay');
+
 const topArt = $('#top-art');
 const tblArt = $('#tbl-art tbody');
-
 
 /* ======== Datos en memoria ======== */
 let rows = [];       // ítems normalizados (_ingreso/_costo/_margen/_pct)
@@ -54,19 +54,13 @@ async function init(){
 
 function bindUI(){
   btnApply.addEventListener('click', fetchAndRender);
-  btnClear.addEventListener('click', () => { clearFilters(); fetchAndRender(); });
+  btnClear.addEventListener('click', () => { clearFilters(); render(); });
   btnCsv.addEventListener('click', exportCSV);
-  topN.addEventListener('change', ()=>{ state.topN = Number(topN.value)||10; drawCharts(); });
+
+  topN.addEventListener('change', ()=>{ state.topN = Number(topN.value)||10; drawChartsFrom(applyFilters(rows)); });
   topArt.addEventListener('change', ()=> renderTopArt(applyFilters(rows)));
 
-
-  // Estados
-  [stVig, stCer, stAnu].forEach(ch => ch.addEventListener('change', () => {
-    state.estados = new Set([...map].filter(([el])=>el.checked).map(([el,val])=>val));
-    render(); // no refetch
-  }));
-
-  // Tabs
+  // Tabs (generales y del drawer)
   $$('.tab').forEach(b=>{
     b.addEventListener('click', ()=>{
       const group = b.closest('.tabs');
@@ -79,9 +73,10 @@ function bindUI(){
     });
   });
 
-  // Drawer
-  dwClose.addEventListener('click', ()=> drawer.classList.remove('open'));
-  document.addEventListener('keydown', e=>{ if (e.key==='Escape') drawer.classList.remove('open'); });
+  // Drawer (botón, Esc y overlay)
+  dwClose.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e=>{ if (e.key==='Escape') closeDrawer(); });
+  overlay.addEventListener('click', closeDrawer);
 
   // Buscar ID en tabla presupuestos (debounce)
   let tId = 0;
@@ -108,9 +103,9 @@ async function fetchAndRender(){
     heads = buildHeads(rows);
 
     // poblar selects (listas del conjunto)
-    hydrateSelect(fVend, unique(rows.map(r=>r.vendedor_descripcion||r.vendedor_id||'SIN VENDEDOR')));
-    hydrateSelect(fCli,  unique(rows.map(r=>r.cliente_descripcion||r.cliente_id||'SIN CLIENTE')));
-    hydrateSelect(fSuc,  unique(rows.map(r=>r.stock_origen_descripcion||r.stock_origen_id||'SIN SUCURSAL')));
+    hydrateSelect(fVend, unique(rows.map(r=>r.vendedor)));
+    hydrateSelect(fCli,  unique(rows.map(r=>r.cliente)));
+    hydrateSelect(fSuc,  unique(rows.map(r=>r.sucursal)));
 
     // restaurar selección previa
     reapplySelect(fVend, state.vendedores); reapplySelect(fCli, state.clientes); reapplySelect(fSuc, state.sucursales);
@@ -142,13 +137,12 @@ function render(){
   drawChartsFrom(filtered);
   renderAggTables(filtered);
   renderHeads(qId.value.trim(), filtered);
-  renderItems(filtered);
   renderTopArt(filtered);
 }
 
+/* ======== Top Artículos ======== */
 function renderTopArt(data){
   const n = Number(topArt?.value) || 10;
-  // agrupamos por artículo
   const agg = new Map();
   for (const r of data){
     const k = r.articulo;
@@ -190,7 +184,6 @@ function captureFiltersFromUI(){
   state.topN       = Number(topN.value)||10;
 }
 function applyFilters(data){
-  const est = state.estados;
   const vend = state.vendedores, cli = state.clientes, suc = state.sucursales;
   const id = state.presuId;
   return data.filter(r=>{
@@ -242,9 +235,7 @@ function miniBar(canvas, labels, data, onClick){
 function paintAggTable(tbody, aggObj, kind){
   const arr = topBy(aggObj,'ingreso',Infinity);
   tbody.innerHTML='';
-  let i=0;
   for (const v of arr){
-    i++;
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${esc(v.key)}</td>
@@ -335,43 +326,23 @@ function openDrawer(h){
     }
   }
   drawer.classList.add('open');
+  overlay.classList.add('open');
 }
 
-/* ======== Items (detalle global) ======== */
-function renderItems(FR){
-  const set = FR || applyFilters(rows);
-  // orden fecha desc
-  set.sort((a,b)=> (a.fecha<b.fecha?1:-1));
-  const rowsPerPage = 50;
-  const pages = Math.max(1, Math.ceil(set.length/rowsPerPage));
-  let page = Number(pgItems.dataset.page||1); if (page>pages) page=pages;
-  const slice = set.slice((page-1)*rowsPerPage, (page-1)*rowsPerPage+rowsPerPage);
-
-  tblItems.innerHTML='';
-  for (const r of slice){
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${fmtDate(r.fecha)}</td><td>${esc(r.id)}</td><td>${esc(r.comprobante)}</td><td>${esc(r.estado)}</td>
-      <td>${esc(r.cliente)}</td><td>${esc(r.vendedor)}</td><td>${esc(r.sucursal)}</td>
-      <td>${esc(r.articulo)}</td><td>${int(r._cant)}</td><td>${money(r.precio)}</td>
-      <td>${money(r._ingreso)}</td><td>${money(r._costo)}</td><td>${money(r._margen)}</td><td class="${mclass(r._pct)}">${pct(r._pct)}</td>`;
-    tblItems.appendChild(tr);
-  }
-
-  pgItems.innerHTML='';
-  for (let i=1;i<=pages;i++){
-    const b=document.createElement('button'); b.textContent=i; if (i===page) b.classList.add('active');
-    b.addEventListener('click', ()=>{ pgItems.dataset.page=i; renderItems(set); });
-    pgItems.appendChild(b);
-  }
+function closeDrawer(){
+  drawer.classList.remove('open');
+  overlay.classList.remove('open');
 }
 
 /* ======== Export ======== */
 function exportCSV(){
   const filtered = applyFilters(rows);
-  // dos archivos: cabeceras e ítems
   const headsSet = buildHeads(filtered);
-  downloadCSV('presupuestos.csv', toCSV(['fecha','id','comprobante','cliente','vendedor','sucursal','items','ingreso','costo','margen','pct'], headsSet));
+  downloadCSV('presupuestos.csv', toCSV(
+    ['fecha','id','comprobante','cliente','vendedor','sucursal','items','ingreso','costo','margen','pct'],
+    headsSet
+  ));
+  // Export de ítems (aunque no haya tabla global, sigue siendo útil)
   downloadCSV('items.csv', toCSV(
     ['fecha','id','comprobante','estado','cliente','vendedor','sucursal','articulo','_cant','precio','_ingreso','_costo','_margen','_pct'],
     filtered
@@ -458,14 +429,14 @@ function paintActiveFilters(){
   push('Suc',  state.sucursales, 'Suc');
 }
 
-function disableUI(b){ [fDesde,fHasta,fVend,fCli,fSuc,fId,btnApply,btnClear,btnCsv,topN].forEach(el=>el.disabled=b); }
+function disableUI(b){ [fDesde,fHasta,fVend,fCli,fSuc,fId,btnApply,btnClear,btnCsv,topN,topArt].forEach(el=>el.disabled=b); }
 function setStatus(msg){ statusEl.textContent=msg; }
 
 function money(n){ const v=Number(n)||0; return v.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function int(n){ const v=Number(n)||0; return v.toLocaleString('es-AR'); }
 function pct(p){ return ((Number(p)||0)*100).toFixed(1)+'%'; }
 function round2(x){ return Math.round((Number(x)||0)*100)/100; }
-function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&gt;','>':'&quot;',"'":'&#39;'}[m])); }
 function fmtDate(ymd){ if(!ymd) return ''; const [Y,M,D]=String(ymd).split('-'); return `${D}/${M}/${Y}`; }
 function mclass(p){
   const v=(Number(p)||0)*100;
@@ -492,7 +463,6 @@ function restoreState(){
   if (s.vendedores) state.vendedores=new Set(s.vendedores);
   if (s.clientes) state.clientes=new Set(s.clientes);
   if (s.sucursales) state.sucursales=new Set(s.sucursales);
-  if (s.estados) state.estados=new Set(s.estados);
   if (s.topN) state.topN=s.topN;
   topN.value = state.topN;
 }
@@ -502,3 +472,17 @@ window.addEventListener('beforeunload', ()=>{
     topN:state.topN
   }));
 });
+
+/* ======== Utilidad: limpiar filtros ======== */
+function clearFilters(){
+  state.vendedores.clear();
+  state.clientes.clear();
+  state.sucursales.clear();
+  state.presuId = '';
+  reapplySelect(fVend, state.vendedores);
+  reapplySelect(fCli, state.clientes);
+  reapplySelect(fSuc, state.sucursales);
+  fId.value = '';
+  qId.value = '';
+  topN.value = String(state.topN || 10);
+}
