@@ -1,7 +1,0 @@
-{
-  "framework": null,
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/api/presupuesto_detalle", "destination": "/api/presupuesto_detalle.js" }
-  ]
-}
