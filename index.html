@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Presupuestos · Análisis</title>
   <link rel="stylesheet" href="./styles.css" />
+  <!-- Chart.js (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -24,9 +26,9 @@
   </header>
 
   <main class="container">
-    <section class="cards">
+    <section class="cards cards-4">
       <div class="card">
-        <div class="card-title">Filas</div>
+        <div class="card-title">Filas (ítems)</div>
         <div class="card-value" id="m-rows">0</div>
       </div>
       <div class="card">
@@ -34,32 +36,98 @@
         <div class="card-value" id="m-vendedores">0</div>
       </div>
       <div class="card">
-        <div class="card-title">Importe total (items)</div>
+        <div class="card-title">Ingreso (importe ítems)</div>
         <div class="card-value" id="m-importe">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Margen (%)</div>
+        <div class="card-value" id="m-margen">0%</div>
+        <div class="card-sub" id="m-margen-detalle">Ingresos: $0 · Costos: $0</div>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <h2>Ventas por vendedor (Top)</h2>
+        <div class="toolbar">
+          <label>Top <input type="number" id="top-vendedores" value="10" min="3" max="50"></label>
+        </div>
+        <canvas id="chartVendedores" height="240"></canvas>
+      </div>
+
+      <div class="panel">
+        <h2>Ventas por cliente (Top)</h2>
+        <div class="toolbar">
+          <label>Top <input type="number" id="top-clientes" value="10" min="3" max="50"></label>
+        </div>
+        <canvas id="chartClientes" height="240"></canvas>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <h2>Pareto de artículos</h2>
+        <div class="table-wrapper">
+          <table id="tbl-pareto-articulos">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Artículo</th>
+                <th>Ingreso</th>
+                <th>%</th>
+                <th>% Acum.</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Pareto de clientes</h2>
+        <div class="table-wrapper">
+          <table id="tbl-pareto-clientes">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Ingreso</th>
+                <th>%</th>
+                <th>% Acum.</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <section class="panel">
-      <h2>Top vendedores</h2>
+      <h2>Presupuestos (cabeceras)</h2>
       <div class="table-wrapper">
-        <table id="tbl-vendedores">
+        <table id="tbl-heads">
           <thead>
             <tr>
+              <th>Fecha</th>
+              <th>ID</th>
+              <th>Comprobante</th>
+              <th>Cliente</th>
               <th>Vendedor</th>
               <th>Ítems</th>
-              <th>Cantidad</th>
-              <th>Importe</th>
-              <th>Precio Prom.</th>
-              <th>Ticket Prom. (por ítem)</th>
+              <th>Ingreso</th>
+              <th>Costo</th>
+              <th>Margen</th>
+              <th>%</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
+      <div class="pagination" id="paginacion-heads"></div>
     </section>
 
     <section class="panel">
-      <h2>Detalle</h2>
+      <h2>Detalle (ítems)</h2>
       <div class="table-wrapper">
         <table id="tbl-detalle">
           <thead>
@@ -73,6 +141,9 @@
               <th>Cant.</th>
               <th>Precio</th>
               <th>Importe Ítem</th>
+              <th>Costo</th>
+              <th>Margen</th>
+              <th>%</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -81,6 +152,32 @@
       <div class="pagination" id="paginacion"></div>
     </section>
   </main>
+
+  <aside id="drawer">
+    <div class="drawer-header">
+      <h3 id="drawer-title">Presupuesto</h3>
+      <button id="drawer-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="meta" id="drawer-meta"></div>
+      <div class="table-wrapper">
+        <table id="drawer-table">
+          <thead>
+            <tr>
+              <th>Artículo</th>
+              <th>Cant.</th>
+              <th>Precio</th>
+              <th>Importe</th>
+              <th>Costo</th>
+              <th>Margen</th>
+              <th>%</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </aside>
 
   <footer class="foot">
     <span id="status">Listo.</span>
