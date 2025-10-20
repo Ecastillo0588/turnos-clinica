@@ -240,3 +240,26 @@ body::-webkit-scrollbar-thumb:hover{background:#253041}
 @media (max-width: 900px){
   .meta-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
+
+/* 1) Dejá que las capas del drawer puedan encogerse horizontalmente */
+#drawer .drawer-body,
+#drawer .tabs,
+#drawer .tabs .tabs-body,
+#drawer .tabs .tab-pane{
+  min-width: 0;           /* ← clave para que aparezca el overflow horizontal */
+}
+
+/* 2) Asegurá sólo scroll horizontal en los wrappers del drawer (opcional) */
+#drawer .table-wrapper{
+  overflow-x: auto;
+  overflow-y: hidden;     /* evita doble scroll vertical dentro del drawer */
+}
+
+/* 3) Por si el grid padre corta el scroll (algunas versiones de WebKit) */
+#drawer .tabs .tab-pane .table-wrapper{
+  display: block;         /* fuerza bloque independiente del grid */
+  max-width: 100%;        /* explícito, junto a tu width:100% */
+}
+
+/* 4) Si tu OS oculta barras, “obligá” el espacio de la barra (cosmético) */
+#drawer .table-wrapper{ scrollbar-gutter: stable both-edges; }
