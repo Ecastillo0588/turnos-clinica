@@ -8,7 +8,6 @@ const state = {
   from: '', to: '',
   vendedores: new Set(),
   clientes: new Set(),
-  sucursales: new Set(),
   estados: new Set(['VIGENTE','CERRADO','ANULADO']),
   presuId: '',
   topN: 10
@@ -17,7 +16,6 @@ const state = {
 /* ======== Elementos ======== */
 const fDesde = $('#f-desde'), fHasta = $('#f-hasta');
 const fVend = $('#f-vendedor'), fCli = $('#f-cliente'), fSuc = $('#f-sucursal');
-const stVig = $('#st-vigente'), stCer = $('#st-cerrado'), stAnu = $('#st-anulado');
 const fId = $('#f-id'), btnApply = $('#btn-apply'), btnClear = $('#btn-clear'), btnCsv = $('#btn-csv');
 const activeFilters = $('#active-filters');
 const topN = $('#topN');
@@ -59,7 +57,6 @@ function bindUI(){
 
   // Estados
   [stVig, stCer, stAnu].forEach(ch => ch.addEventListener('change', () => {
-    const map = new Map([[stVig,'VIGENTE'],[stCer,'CERRADO'],[stAnu,'ANULADO']]);
     state.estados = new Set([...map].filter(([el])=>el.checked).map(([el,val])=>val));
     render(); // no refetch
   }));
@@ -160,7 +157,6 @@ function applyFilters(data){
     if (vend.size && !vend.has(r.vendedor)) return false;
     if (cli.size && !cli.has(r.cliente)) return false;
     if (suc.size && !suc.has(r.sucursal)) return false;
-    if (!est.has((r.estado||'').toUpperCase())) return false;
     return true;
   });
 }
@@ -462,6 +458,6 @@ function restoreState(){
 window.addEventListener('beforeunload', ()=>{
   localStorage.setItem('panel_state', JSON.stringify({
     vendedores:[...state.vendedores], clientes:[...state.clientes], sucursales:[...state.sucursales],
-    estados:[...state.estados], topN:state.topN
+    topN:state.topN
   }));
 });
