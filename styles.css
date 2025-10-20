@@ -4,114 +4,195 @@
   --gold:#D9A441; --gold-hover:#C79232; --gold-soft:#F2D8A4; --gold-dark:#8C6A1F;
   --good-strong:#2FB36E; --good:#59C38B; --warn2:#E3C26E; --warn:#F0A259; --bad:#E35D6A;
   --info:#6CA8FF;
+
+  /* tipografías & tamaño base */
+  --fs-12: 12px;
+  --fs-14: 14px;
+  --fs-20: 20px;
+
+  /* radios, sombras */
+  --r-8: 8px;
+  --r-12: 12px;
+  --shadow-1: 0 6px 18px rgba(0,0,0,.25);
 }
 *{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45
+}
 
-.appbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#121820,rgba(18,24,32,.9));border-bottom:1px solid var(--border)}
+/* ===== Topbar & Filtros ===== */
+.appbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#121820,rgba(18,24,32,.9));border-bottom:1px solid var(--border);backdrop-filter:saturate(120%) blur(4px)}
 .appbar-title{padding:10px 16px;font-weight:700}
 .filters{padding:8px 16px;display:grid;gap:10px}
 .filters .row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-label{display:grid;gap:4px;font-size:12px;color:var(--sub)}
-input,select{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;min-height:36px}
+label{display:grid;gap:4px;font-size:var(--fs-12);color:var(--sub)}
+input,select{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  padding:8px 10px;border-radius:var(--r-8);min-height:36px;outline:none
+}
 input::placeholder{color:#8797aa}
 select[multiple]{min-width:180px;min-height:36px}
 .actions{display:flex;gap:8px}
-button{background:var(--gold);border:0;color:#1a1405;font-weight:700;border-radius:8px;padding:10px 14px;cursor:pointer}
-button.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+button{
+  background:var(--gold);border:0;color:#1a1405;font-weight:700;border-radius:var(--r-8);padding:10px 14px;cursor:pointer;transition:transform .06s ease
+}
 button:hover{background:var(--gold-hover)}
+button:active{transform:translateY(1px)}
+button.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
 button.ghost:hover{border-color:var(--gold);color:var(--gold)}
+/* focus visible accesible */
+:where(button,input,select){outline:none}
+:where(button,input,select):focus-visible{box-shadow:0 0 0 2px rgba(217,164,65,.35),0 0 0 4px rgba(217,164,65,.15);border-color:var(--gold)}
+
 .chips{display:flex;gap:8px;align-items:center}
 .chip{display:flex;gap:6px;align-items:center;background:transparent;border:1px solid var(--border);padding:6px 8px;border-radius:999px}
 .active-filters{display:flex;flex-wrap:wrap;gap:6px}
-.active-filters .af{font-size:12px;color:#0b0b0b;background:var(--gold-soft);border:1px solid var(--gold-dark);border-radius:999px;padding:4px 8px}
-.active-filters .af button{margin-left:6px;background:transparent;border:0;color:#3b2b05;padding:0;cursor:pointer}
+.active-filters .af{
+  font-size:var(--fs-12);color:#0b0b0b;background:var(--gold-soft);
+  border:1px solid var(--gold-dark);border-radius:999px;padding:4px 8px;display:inline-flex;align-items:center
+}
+.active-filters .af button{
+  margin-left:6px;background:transparent;border:0;color:#3b2b05;padding:0;cursor:pointer
+}
 
+/* ===== Layout ===== */
 .container{max-width:1400px;margin:18px auto;padding:0 16px;display:grid;gap:18px}
 .cards{display:grid;gap:12px}
 .cards-6{grid-template-columns:repeat(6,1fr)}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px}
-.card-title{font-size:12px;color:var(--sub)}
-.card-value{margin-top:6px;font-size:20px;font-weight:800}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-12);padding:12px;
+  box-shadow:var(--shadow-1)
+}
+.card-title{font-size:var(--fs-12);color:var(--sub)}
+.card-value{margin-top:6px;font-size:var(--fs-20);font-weight:800}
 
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px}
+/* ===== Panels ===== */
+.panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-12);padding:12px
+}
 .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .search-inline input{width:220px}
-.table-wrapper{overflow:auto;border-radius:8px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;min-width:820px}
-thead th{position:sticky;top:0;background:#0f1620;color:var(--sub);font-size:12px;text-align:left;padding:10px;border-bottom:1px solid var(--border)}
-tbody td{padding:10px;border-bottom:1px solid #1b2430;font-size:14px}
+
+/* ===== Tablas ===== */
+.table-wrapper{overflow:auto;border-radius:var(--r-8);border:1px solid var(--border)}
+table{
+  width:100%;border-collapse:collapse;min-width:820px;
+  table-layout: fixed; /* columnas fijas = layout estable */
+}
+thead th{
+  position:sticky;top:0;background:#0f1620;color:var(--sub);
+  font-size:var(--fs-12);text-align:left;padding:10px;border-bottom:1px solid var(--border);z-index:1
+}
+tbody td{padding:10px;border-bottom:1px solid #1b2430;font-size:var(--fs-14)}
 tbody tr:hover{background:#0e141c}
 .table-10 tbody tr:nth-child(n+11){display:none}
-.badge{padding:2px 6px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--sub)}
+.badge{padding:2px 6px;border-radius:999px;border:1px solid var(--border);font-size:var(--fs-12);color:var(--sub)}
+/* Cols numéricas */
+td.num, th.num{ text-align:right; font-variant-numeric: tabular-nums }
+/* Hacer filas “clickables” visibles al usuario */
+#tbl-heads tbody tr.clickable{cursor:pointer}
+#tbl-heads tbody tr.clickable:hover{background:#101827}
 
+/* Si querés widths más estables por columna (opcional)
+   podés setear porcentajes por tabla “grande” */
+#tbl-heads th:nth-child(1){width:9%}
+#tbl-heads th:nth-child(2){width:8%}
+#tbl-heads th:nth-child(3){width:12%}
+#tbl-heads th:nth-child(4){width:16%}
+#tbl-heads th:nth-child(5){width:14%}
+#tbl-heads th:nth-child(6){width:14%}
+#tbl-heads th:nth-child(7){width:7%}
+#tbl-heads th:nth-child(8),
+#tbl-heads th:nth-child(9),
+#tbl-heads th:nth-child(10),
+#tbl-heads th:nth-child(11){width:5%}
+
+/* ===== Tabs ===== */
 .tabs .tabs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.tab{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;margin-right:6px;cursor:pointer}
+.tab{
+  background:transparent;border:1px solid var(--border);color:var(--text);
+  border-radius:var(--r-8);padding:6px 10px;margin-right:6px;cursor:pointer
+}
 .tab.active{background:var(--gold-soft);color:#2b1d03;border-color:var(--gold-dark)}
-.tab-pane{display:none}.tab-pane.active{display:block}
-.two{display:grid;grid-template-columns:360px 1fr;gap:12px}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
 
+/* Dos columnas: gráfico + tabla */
+.two{display:grid;grid-template-columns:360px 1fr;gap:12px}
+.two > div:first-child{min-width:0} /* evita overflow del contenedor izquierdo */
+
+/* ===== Gráficos (Key: NO romper layout) ===== */
+canvas{max-width:100%;display:block} /* el chart nunca ensancha el grid */
+.chart-box{ /* si querés, envolvé el canvas con <div class="chart-box"> */
+  min-height:160px; /* la altura real la decide JS, acá garantizamos base */
+  overflow:hidden;  /* evita que tooltips/labels estiren el contenedor */
+}
+
+/* ===== Paginación ===== */
 .pagination{display:flex;gap:8px;justify-content:center;padding-top:10px}
-.pagination button{background:transparent;border:1px solid var(--border);color:var(--text)}
+.pagination button{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:var(--r-8);padding:6px 10px}
 .pagination button.active{background:var(--gold-soft);color:#1a1405;border-color:var(--gold-dark)}
 
-#drawer{position:fixed;top:0;right:-560px;width:560px;height:100%;background:#0f1620;border-left:2px solid var(--gold-soft);box-shadow:-8px 0 24px rgba(0,0,0,.35);transition:right .25s ease;z-index:30;display:grid;grid-template-rows:auto 1fr}
+/* ===== Drawer ===== */
+#drawer{
+  position:fixed;top:0;right:-560px;width:560px;height:100%;
+  background:#0f1620;border-left:2px solid var(--gold-soft);
+  box-shadow:-8px 0 24px rgba(0,0,0,.35);
+  transition:right .25s ease;z-index:30;display:grid;grid-template-rows:auto 1fr
+}
 #drawer.open{right:0}
 .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
 .drawer-body{padding:12px;display:grid;gap:10px}
 .meta{display:grid;gap:6px;color:var(--sub);font-size:13px}
-
-.ok{color:var(--good-strong)} .ok2{color:var(--good)}
-.warn{color:var(--warn2)} .warn2{color:var(--warn)} .bad{color:var(--bad)}
-
-.foot{padding:12px 16px;color:var(--sub);border-top:1px solid var(--border)}
-
-@media (max-width:1200px){.cards-6{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}}
-@media (max-width:700px){.cards-6{grid-template-columns:1fr}}
-/* Botón cerrar en el sidebar: que se vea y tenga contraste */
+/* Botón cerrar */
 #dw-close{
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
+  background: transparent;border: 1px solid var(--border);color: var(--text);
+  border-radius: var(--r-8);padding: 6px 10px;cursor: pointer
 }
-#dw-close:hover{ border-color: var(--gold); color: var(--gold); }
+#dw-close:hover{ border-color: var(--gold); color: var(--gold) }
 
 /* Overlay para cerrar con clic afuera */
 #overlay{
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.35);
-  opacity: 0; pointer-events: none;
-  transition: opacity .2s ease;
-  z-index: 25; /* debajo del drawer (z=30) */
+  position: fixed; inset: 0; background: rgba(0,0,0,.35);
+  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 25
 }
-#overlay.open{ opacity: 1; pointer-events: auto; }
+#overlay.open{ opacity: 1; pointer-events: auto }
 
-/* Evitar que números largos rompan el layout */
+/* ===== KPIs ===== */
 .card-value{
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis
 }
 
-/* Tablas estables */
-.table-wrapper{ overflow:auto; border-radius:8px; border:1px solid var(--border) }
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:820px;
-  table-layout: fixed;           /* <— clave: columnas fijas */
+/* ===== Estados de margen ===== */
+.ok{color:var(--good-strong)} .ok2{color:var(--good)}
+.warn{color:var(--warn2)}     .warn2{color:var(--warn)} .bad{color:var(--bad)}
+
+/* ===== Footer ===== */
+.foot{padding:12px 16px;color:var(--sub);border-top:1px solid var(--border)}
+
+/* ===== Scrollbars (WebKit) ===== */
+.table-wrapper::-webkit-scrollbar,
+body::-webkit-scrollbar{height:10px;width:10px}
+.table-wrapper::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track{background:#0e141c}
+.table-wrapper::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb{background:#1d2632;border-radius:8px;border:2px solid #0e141c}
+.table-wrapper::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover{background:#253041}
+
+/* ===== Responsive ===== */
+@media (max-width:1200px){
+  .cards-6{grid-template-columns:repeat(3,1fr)}
+  .two{grid-template-columns:1fr}
 }
-thead th, tbody td{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;       /* muestra … si no entra */
-}
-td.num, th.num{
-  text-align:right;
-  font-variant-numeric: tabular-nums;
+@media (max-width:700px){
+  .cards-6{grid-template-columns:1fr}
+  .search-inline input{width:100%}
 }
 
+/* ===== Motion preferences ===== */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important}
+}
