@@ -28,6 +28,9 @@ const tblItems = $('#tbl-items tbody'), pgItems = $('#pg-items');
 
 const drawer = $('#drawer'), dwClose = $('#dw-close');
 const dwTitle = $('#dw-title'), dwMeta = $('#dw-meta'), dwBody = $('#dw-table tbody'), dwResBody = $('#dw-res-table tbody');
+const topArt = $('#top-art');
+const tblArt = $('#tbl-art tbody');
+
 
 /* ======== Datos en memoria ======== */
 let rows = [];       // ítems normalizados (_ingreso/_costo/_margen/_pct)
@@ -54,6 +57,8 @@ function bindUI(){
   btnClear.addEventListener('click', () => { clearFilters(); fetchAndRender(); });
   btnCsv.addEventListener('click', exportCSV);
   topN.addEventListener('change', ()=>{ state.topN = Number(topN.value)||10; drawCharts(); });
+  topArt.addEventListener('change', ()=> renderTopArt(applyFilters(rows)));
+
 
   // Estados
   [stVig, stCer, stAnu].forEach(ch => ch.addEventListener('change', () => {
@@ -138,6 +143,42 @@ function render(){
   renderAggTables(filtered);
   renderHeads(qId.value.trim(), filtered);
   renderItems(filtered);
+  renderTopArt(filtered);
+}
+
+function renderTopArt(data){
+  const n = Number(topArt?.value) || 10;
+  // agrupamos por artículo
+  const agg = new Map();
+  for (const r of data){
+    const k = r.articulo;
+    const a = agg.get(k) || { key:k, items:0, cant:0, ingreso:0, costo:0, margen:0 };
+    a.items += 1;
+    a.cant  += r._cant;
+    a.ingreso += r._ingreso;
+    a.costo   += r._costo;
+    a.margen  += r._margen;
+    agg.set(k, a);
+  }
+  const arr = Array.from(agg.values())
+    .map(v => ({ ...v, pct: v.ingreso>0 ? v.margen/v.ingreso : 0, precioProm: v.cant>0 ? v.ingreso/v.cant : 0 }))
+    .sort((a,b)=> b.ingreso - a.ingreso)
+    .slice(0, n);
+
+  tblArt.innerHTML = '';
+  for (const v of arr){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${esc(v.key)}</td>
+      <td>${int(v.items)}</td>
+      <td>${int(v.cant)}</td>
+      <td>${money(v.ingreso)}</td>
+      <td>${money(v.precioProm)}</td>
+      <td>${money(v.margen)}</td>
+      <td class="${mclass(v.pct)}">${pct(v.pct)}</td>
+    `;
+    tblArt.appendChild(tr);
+  }
 }
 
 /* ======== Filtros ======== */
