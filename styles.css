@@ -176,26 +176,21 @@ canvas{max-width:100%; display:block}
 /* Drawer: tablas con scroll horizontal real */
 #drawer .table-wrapper{
   display:block;
-  max-width:100%;
-  overflow-x:auto;
+  width:100%;                /* ← clave: ocupa el ancho del drawer */
+  overflow-x:auto;           /* ← permite scroll horizontal */
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   scrollbar-gutter:stable both-edges;
 }
 #dw-table, #dw-res-table{
-  width: max-content;  /* ← CLAVE: expande según contenido/colgroup */
-  min-width: 1200px;   /* asegura overflow en drawers angostos */
-  table-layout: fixed;
-  white-space: nowrap; /* evita saltos que “encogen” la tabla */
+  width:max-content;         /* ← se expande al contenido */
+  min-width:1200px;          /* asegura overflow en drawers angostos */
+  table-layout:fixed;
+  white-space:nowrap;        /* evita que se partan celdas y “achiquen” la tabla */
 }
-/* Anchos sugeridos DW-Items */
-#dw-table th:nth-child(1){ width:36% } /* Artículo */
-#dw-table th:nth-child(2){ width:8%  } /* Cant.    */
-#dw-table th:nth-child(3){ width:12% } /* Precio   */
-#dw-table th:nth-child(4){ width:14% } /* Importe  */
-#dw-table th:nth-child(5){ width:14% } /* Costo    */
-#dw-table th:nth-child(6){ width:14% } /* Margen   */
-#dw-table th:nth-child(7){ width:8%  } /* %        */
+/* Evita que los panes del drawer fuercen un ancho mayor al contenedor */
+#drawer .tabs .tab-pane{ min-width:0; }
+
 /* Números prolijos también en el drawer */
 #dw-table td.num, #dw-table th.num,
 #dw-res-table td.num, #dw-res-table th.num{
