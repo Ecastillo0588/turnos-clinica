@@ -453,41 +453,43 @@ function openDrawer(h){
     <div><b>Vendedor:</b> ${esc(h.vendedor)}</div>
     <div><b>Sucursal:</b> ${esc(h.sucursal)}</div>
     <div><b>Ingreso:</b> ${money(h.ingreso)} · <b>Costo:</b> ${money(h.costo)} · <b>Margen:</b> ${money(h.margen)} <span class="${mclass(h.pct)}">(${pct(h.pct)})</span></div>`;
-  // Ítems
-  dwBody.innerHTML='';
+
+  // Ítems (con margen por ítem y %)
+  dwBody.innerHTML = '';
   for (const r of h.rows){
-    const tr=document.createElement('tr');
+    const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${esc(r.articulo)}</td>
       <td class="num">${int(r._cant)}</td>
-      <td class="num">${money(r.precio)}</td>
-      <td class="num">${money(r._ingreso)}</td>
-      <td class="num">${money(r._costo)}</td>
-      <td class="num">${money(r._margen)}</td>
+      <td class="num" title="${money(r.precio)}">${moneyCompact(r.precio)}</td>
+      <td class="num" title="${money(r._ingreso)}">${moneyCompact(r._ingreso)}</td>
+      <td class="num" title="${money(r._costo)}">${moneyCompact(r._costo)}</td>
+      <td class="num" title="${money(r._margen)}">${moneyCompact(r._margen)}</td>
       <td class="${mclass(r._pct)}">${pct(r._pct)}</td>`;
     dwBody.appendChild(tr);
   }
-  // Resumen sucursal / artículo
+
+  // Resumen sucursal / artículo (deja como ya lo tenías, pero puedes compactar igual)
   const bySuc = aggregate(h.rows, r=>r.sucursal), byArt = aggregate(h.rows, r=>r.articulo);
   dwResBody.innerHTML='';
-  for (const g of [['Sucursal',bySuc],['Artículo',byArt]]){
-    for (const v of topBy(g[1],'ingreso',Infinity)){
+  for (const [label, group] of [['Sucursal',bySuc],['Artículo',byArt]]){
+    for (const v of topBy(group,'ingreso',Infinity)){
       const tr=document.createElement('tr');
       tr.innerHTML = `
-        <td>${g[0]}</td><td>${esc(v.key)}</td>
-        <td class="num">${int(v.items)}</td><td class="num">${money(v.ingreso)}</td><td class="num">${money(v.costo)}</td>
-        <td class="num">${money(v.margen)}</td><td class="${mclass(v.pct)}">${pct(v.pct)}</td>`;
+        <td>${label}</td><td>${esc(v.key)}</td>
+        <td class="num">${int(v.items)}</td>
+        <td class="num" title="${money(v.ingreso)}">${moneyCompact(v.ingreso)}</td>
+        <td class="num" title="${money(v.costo)}">${moneyCompact(v.costo)}</td>
+        <td class="num" title="${money(v.margen)}">${moneyCompact(v.margen)}</td>
+        <td class="${mclass(v.pct)}">${pct(v.pct)}</td>`;
       dwResBody.appendChild(tr);
     }
   }
+
   drawer.classList.add('open');
   overlay.classList.add('open');
 }
 
-function closeDrawer(){
-  drawer.classList.remove('open');
-  overlay.classList.remove('open');
-}
 
 /* ======== Export ======== */
 function exportCSV(){
