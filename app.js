@@ -320,41 +320,55 @@ function paintAggTable(tbody, aggObj, kind){
 }
 
 /* ======== Heads & Drawer ======== */
-function renderHeads(searchExact='', filteredRows=null){
+function renderHeads(searchTerm = '', filteredRows = null){
   const FR = filteredRows || applyFilters(rows);
-  const set = buildHeads(FR);
+  let set = buildHeads(FR);
 
-  // orden por Ingreso desc, tie-break fecha desc
+  // Orden por Ingreso desc, empate por fecha desc
   set.sort((a,b)=> b.ingreso - a.ingreso || (a.fecha<b.fecha?1:-1));
 
-  const rowsPerPage   = 10;     // filas por página
-  const pagesPerBlock = 10;     // páginas visibles por bloque
+  // Normalizador: sin acentos y en minúscula
+  const norm = s => String(s ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
+
+  const q = norm(searchTerm || '');
+
+  // 🔎 Filtrar por comprobante (subcadena, case/acentos-insensitive)
+  //    Si escriben un número exacto, también dejamos matchear por ID.
+  if (q) {
+    set = set.filter(h => {
+      const comp = norm(h.comprobante);
+      const idStr = String(h.id ?? '');
+      const qIsNumericExact = /^\d+$/.test(searchTerm.trim());
+      return comp.includes(q) || (qIsNumericExact && idStr === searchTerm.trim());
+    });
+  }
+
+  // Paginación (sobre el conjunto ya filtrado)
+  const rowsPerPage   = 10;
+  const pagesPerBlock = 10;
   const totalPages    = Math.max(1, Math.ceil(set.length / rowsPerPage));
 
-  // estado actual de paginación (persistimos en dataset del contenedor)
   let page  = Number(pgHeads.dataset.page  || 1);
   let block = Number(pgHeads.dataset.block || 1);
 
-  // clamp page al rango
   if (page > totalPages) page = totalPages;
   if (page < 1) page = 1;
 
-  // calcular bloque en base a page si no está seteado
   const currentBlock = Math.ceil(page / pagesPerBlock);
   if (!pgHeads.dataset.block) block = currentBlock;
 
-  // límites del bloque actual
   const blockStart = (block - 1) * pagesPerBlock + 1;
   const blockEnd   = Math.min(blockStart + pagesPerBlock - 1, totalPages);
 
-  // slice de filas de la página actual
   const startIdx = (page - 1) * rowsPerPage;
   const slice    = set.slice(startIdx, startIdx + rowsPerPage);
 
-  // pintar tabla
+  // Pintar tabla
   tblHeads.innerHTML='';
   for (const h of slice){
-    if (searchExact && String(h.id)!==searchExact) continue;
     const tr = document.createElement('tr');
     tr.className='clickable';
     tr.innerHTML = `
@@ -373,24 +387,20 @@ function renderHeads(searchExact='', filteredRows=null){
     tblHeads.appendChild(tr);
   }
 
-  // paginación por bloques
+  // Paginación por bloques (mismo esquema que veníamos usando)
   pgHeads.innerHTML='';
 
   const setStateAndRender = (newPage, newBlock) => {
     pgHeads.dataset.page  = String(newPage);
     pgHeads.dataset.block = String(newBlock);
-    renderHeads(searchExact, FR);
+    renderHeads(searchTerm, FR);
   };
 
   const makeBtn = (label, disabled, handler, title='') => {
     const b = document.createElement('button');
     b.textContent = label;
     if (title) b.title = title;
-    if (disabled) {
-      b.disabled = true;
-    } else {
-      b.addEventListener('click', handler);
-    }
+    if (disabled) b.disabled = true; else b.addEventListener('click', handler);
     return b;
   };
 
@@ -403,7 +413,7 @@ function renderHeads(searchExact='', filteredRows=null){
     makeBtn('‹', page<=1, () => setStateAndRender(page-1, Math.ceil((page-1)/pagesPerBlock)), 'Anterior')
   );
 
-  // botones del bloque actual (máx 10)
+  // Numeritos del bloque actual
   for (let p = blockStart; p <= blockEnd; p++){
     const b = makeBtn(String(p), false, () => setStateAndRender(p, block));
     if (p === page) b.classList.add('active');
@@ -423,7 +433,7 @@ function renderHeads(searchExact='', filteredRows=null){
     }, 'Siguientes 10 páginas')
   );
 
-  // info compacta del rango de páginas visibles
+  // Info compacta del rango visible
   const info = document.createElement('span');
   info.style.marginLeft = '8px';
   info.style.alignSelf = 'center';
@@ -431,10 +441,10 @@ function renderHeads(searchExact='', filteredRows=null){
   info.textContent = `Mostrando páginas ${blockStart}–${blockEnd} de ${totalPages}`;
   pgHeads.appendChild(info);
 
-  // guardar estado
   pgHeads.dataset.page  = String(page);
   pgHeads.dataset.block = String(block);
 }
+
 
 function openDrawer(h){
   dwTitle.textContent = `Presupuesto ${h.id} · ${fmtDate(h.fecha)}`;
