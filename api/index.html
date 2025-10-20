@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Presupuestos · Análisis</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Presupuestos – Detalle</h1>
+    <div class="filters">
+      <label>
+        Desde
+        <input type="date" id="f-desde" />
+      </label>
+      <label>
+        Hasta
+        <input type="date" id="f-hasta" />
+      </label>
+      <button id="btn-fetch">Buscar</button>
+      <button id="btn-csv" disabled>Exportar CSV</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="cards">
+      <div class="card">
+        <div class="card-title">Filas</div>
+        <div class="card-value" id="m-rows">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Vendedores</div>
+        <div class="card-value" id="m-vendedores">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Importe total (items)</div>
+        <div class="card-value" id="m-importe">0</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Top vendedores</h2>
+      <div class="table-wrapper">
+        <table id="tbl-vendedores">
+          <thead>
+            <tr>
+              <th>Vendedor</th>
+              <th>Ítems</th>
+              <th>Cantidad</th>
+              <th>Importe</th>
+              <th>Precio Prom.</th>
+              <th>Ticket Prom. (por ítem)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Detalle</h2>
+      <div class="table-wrapper">
+        <table id="tbl-detalle">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Comprobante</th>
+              <th>Estado</th>
+              <th>Cliente</th>
+              <th>Vendedor</th>
+              <th>Artículo</th>
+              <th>Cant.</th>
+              <th>Precio</th>
+              <th>Importe Ítem</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="paginacion"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span id="status">Listo.</span>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
