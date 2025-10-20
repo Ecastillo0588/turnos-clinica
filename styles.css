@@ -15,14 +15,22 @@
   --r-12: 12px;
   --shadow-1: 0 6px 18px rgba(0,0,0,.25);
 }
-*{box-sizing:border-box} html,body{height:100%}
+
+*{box-sizing:border-box}
+html,body{height:100%}
 body{
   margin:0;background:var(--bg);color:var(--text);
-  font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45
+  font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+  line-height:1.45
 }
 
 /* ===== Topbar & Filtros ===== */
-.appbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#121820,rgba(18,24,32,.9));border-bottom:1px solid var(--border);backdrop-filter:saturate(120%) blur(4px)}
+.appbar{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,#121820,rgba(18,24,32,.9));
+  border-bottom:1px solid var(--border);
+  backdrop-filter:saturate(120%) blur(4px)
+}
 .appbar-title{padding:10px 16px;font-weight:700}
 .filters{padding:8px 16px;display:grid;gap:10px}
 .filters .row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
@@ -35,7 +43,9 @@ input::placeholder{color:#8797aa}
 select[multiple]{min-width:180px;min-height:36px}
 .actions{display:flex;gap:8px}
 button{
-  background:var(--gold);border:0;color:#1a1405;font-weight:700;border-radius:var(--r-8);padding:10px 14px;cursor:pointer;transition:transform .06s ease
+  background:var(--gold);border:0;color:#1a1405;font-weight:700;
+  border-radius:var(--r-8);padding:10px 14px;cursor:pointer;
+  transition:transform .06s ease
 }
 button:hover{background:var(--gold-hover)}
 button:active{transform:translateY(1px)}
@@ -43,14 +53,18 @@ button.ghost{background:transparent;border:1px solid var(--border);color:var(--t
 button.ghost:hover{border-color:var(--gold);color:var(--gold)}
 /* focus visible accesible */
 :where(button,input,select){outline:none}
-:where(button,input,select):focus-visible{box-shadow:0 0 0 2px rgba(217,164,65,.35),0 0 0 4px rgba(217,164,65,.15);border-color:var(--gold)}
+:where(button,input,select):focus-visible{
+  box-shadow:0 0 0 2px rgba(217,164,65,.35),0 0 0 4px rgba(217,164,65,.15);
+  border-color:var(--gold)
+}
 
 .chips{display:flex;gap:8px;align-items:center}
 .chip{display:flex;gap:6px;align-items:center;background:transparent;border:1px solid var(--border);padding:6px 8px;border-radius:999px}
 .active-filters{display:flex;flex-wrap:wrap;gap:6px}
 .active-filters .af{
   font-size:var(--fs-12);color:#0b0b0b;background:var(--gold-soft);
-  border:1px solid var(--gold-dark);border-radius:999px;padding:4px 8px;display:inline-flex;align-items:center
+  border:1px solid var(--gold-dark);border-radius:999px;padding:4px 8px;
+  display:inline-flex;align-items:center
 }
 .active-filters .af button{
   margin-left:6px;background:transparent;border:0;color:#3b2b05;padding:0;cursor:pointer
@@ -68,9 +82,7 @@ button.ghost:hover{border-color:var(--gold);color:var(--gold)}
 .card-value{margin-top:6px;font-size:var(--fs-20);font-weight:800}
 
 /* ===== Panels ===== */
-.panel{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-12);padding:12px
-}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-12);padding:12px}
 .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .search-inline input{width:220px}
 
@@ -88,25 +100,26 @@ tbody td{padding:10px;border-bottom:1px solid #1b2430;font-size:var(--fs-14)}
 tbody tr:hover{background:#0e141c}
 .table-10 tbody tr:nth-child(n+11){display:none}
 .badge{padding:2px 6px;border-radius:999px;border:1px solid var(--border);font-size:var(--fs-12);color:var(--sub)}
+
 /* Cols numéricas */
 td.num, th.num{ text-align:right; font-variant-numeric: tabular-nums }
-/* Hacer filas “clickables” visibles al usuario */
+
+/* Filas clickables visibles para el usuario */
 #tbl-heads tbody tr.clickable{cursor:pointer}
 #tbl-heads tbody tr.clickable:hover{background:#101827}
 
-/* Si querés widths más estables por columna (opcional)
-   podés setear porcentajes por tabla “grande” */
-#tbl-heads th:nth-child(1){width:9%}
-#tbl-heads th:nth-child(2){width:8%}
-#tbl-heads th:nth-child(3){width:12%}
-#tbl-heads th:nth-child(4){width:16%}
-#tbl-heads th:nth-child(5){width:14%}
-#tbl-heads th:nth-child(6){width:14%}
-#tbl-heads th:nth-child(7){width:7%}
+/* Anchos sugeridos por columna para #tbl-heads (estable) */
+#tbl-heads th:nth-child(1){width:9%}   /* Fecha */
+#tbl-heads th:nth-child(2){width:8%}   /* ID */
+#tbl-heads th:nth-child(3){width:12%}  /* Comprobante */
+#tbl-heads th:nth-child(4){width:16%}  /* Cliente */
+#tbl-heads th:nth-child(5){width:14%}  /* Vendedor */
+#tbl-heads th:nth-child(6){width:14%}  /* Sucursal */
+#tbl-heads th:nth-child(7){width:7%}   /* Ítems */
 #tbl-heads th:nth-child(8),
 #tbl-heads th:nth-child(9),
 #tbl-heads th:nth-child(10),
-#tbl-heads th:nth-child(11){width:5%}
+#tbl-heads th:nth-child(11){width:5%}  /* $ columnas */
 
 /* ===== Tabs ===== */
 .tabs .tabs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -122,17 +135,25 @@ td.num, th.num{ text-align:right; font-variant-numeric: tabular-nums }
 .two{display:grid;grid-template-columns:360px 1fr;gap:12px}
 .two > div:first-child{min-width:0} /* evita overflow del contenedor izquierdo */
 
-/* ===== Gráficos (Key: NO romper layout) ===== */
+/* ===== Gráficos (NO romper layout) ===== */
 canvas{max-width:100%;display:block} /* el chart nunca ensancha el grid */
 .chart-box{ /* si querés, envolvé el canvas con <div class="chart-box"> */
   min-height:160px; /* la altura real la decide JS, acá garantizamos base */
   overflow:hidden;  /* evita que tooltips/labels estiren el contenedor */
 }
 
-/* ===== Paginación ===== */
-.pagination{display:flex;gap:8px;justify-content:center;padding-top:10px}
-.pagination button{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:var(--r-8);padding:6px 10px}
-.pagination button.active{background:var(--gold-soft);color:#1a1405;border-color:var(--gold-dark)}
+/* ===== Paginación (bloques) ===== */
+.pagination{
+  display:flex; align-items:center; gap:8px; justify-content:center; padding-top:10px;
+  flex-wrap:wrap; /* móvil: que haga wrap y no empuje el layout */
+}
+.pagination button{
+  background:transparent; border:1px solid var(--border); color:var(--text);
+  border-radius:var(--r-8); padding:6px 10px; min-width:36px
+}
+.pagination button.active{
+  background:var(--gold-soft); color:#1a1405; border-color:var(--gold-dark)
+}
 
 /* ===== Drawer ===== */
 #drawer{
