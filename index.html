@@ -118,23 +118,6 @@
       <div class="pagination" id="pg-heads"></div>
     </section>
 
-    <section class="panel">
-      <div class="panel-head"><h2>Ítems (detalle del conjunto)</h2></div>
-      <div class="table-wrapper">
-        <table id="tbl-items">
-          <thead>
-            <tr>
-              <th>Fecha</th><th>ID</th><th>Comprobante</th><th>Estado</th>
-              <th>Cliente</th><th>Vendedor</th><th>Sucursal</th>
-              <th>Artículo</th><th>Cant.</th><th>Precio</th>
-              <th>Importe</th><th>Costo</th><th>Margen</th><th>%</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div class="pagination" id="pg-items"></div>
-    </section>
   </main>
 
   <aside id="drawer">
@@ -142,6 +125,7 @@
       <div class="drawer-title" id="dw-title">Presupuesto</div>
       <button id="dw-close" aria-label="Cerrar">✕</button>
     </div>
+    <div id="overlay"></div>
     <div class="drawer-body">
       <div id="dw-meta" class="meta"></div>
       <div class="tabs small">
@@ -172,6 +156,36 @@
       </div>
     </div>
   </aside>
+
+  <section class="panel">
+  <div class="panel-head">
+    <h2>Artículos destacados</h2>
+    <div class="toolbar">
+      <label>Top
+        <select id="top-art">
+          <option>5</option><option selected>10</option><option>15</option><option>20</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="table-wrapper">
+    <table id="tbl-art" class="table-10">
+      <thead>
+        <tr>
+          <th>Artículo</th>
+          <th>Ítems</th>
+          <th>Cantidad</th>
+          <th>Ingreso</th>
+          <th>Precio prom.</th>
+          <th>Margen</th>
+          <th>%</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
 
   <footer class="foot"><span id="status">Listo.</span></footer>
   <script src="./app.js"></script>
