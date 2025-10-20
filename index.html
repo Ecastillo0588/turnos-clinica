@@ -3,186 +3,182 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Presupuestos · Análisis</title>
+  <title>Panel de Ventas</title>
   <link rel="stylesheet" href="./styles.css" />
-  <!-- Chart.js (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <header class="topbar">
-    <h1>Presupuestos – Detalle</h1>
+  <header class="appbar">
+    <div class="appbar-title">Panel de Ventas</div>
     <div class="filters">
-      <label>
-        Desde
-        <input type="date" id="f-desde" />
-      </label>
-      <label>
-        Hasta
-        <input type="date" id="f-hasta" />
-      </label>
-      <button id="btn-fetch">Buscar</button>
-      <button id="btn-csv" disabled>Exportar CSV</button>
+      <div class="row">
+        <label>Desde <input type="date" id="f-desde"></label>
+        <label>Hasta <input type="date" id="f-hasta"></label>
+        <label>Vendedor
+          <select id="f-vendedor" multiple></select>
+        </label>
+        <label>Cliente
+          <select id="f-cliente" multiple></select>
+        </label>
+        <label>Sucursal
+          <select id="f-sucursal" multiple></select>
+        </label>
+        <div class="chips">
+          <label class="chip"><input type="checkbox" id="st-vigente" checked> Vigente</label>
+          <label class="chip"><input type="checkbox" id="st-cerrado" checked> Cerrado</label>
+          <label class="chip"><input type="checkbox" id="st-anulado" checked> Anulado</label>
+        </div>
+        <label># Presupuesto <input id="f-id" placeholder="Buscar ID exacto" /></label>
+        <div class="actions">
+          <button id="btn-apply">Aplicar</button>
+          <button id="btn-clear" class="ghost">Limpiar</button>
+          <button id="btn-csv" class="ghost" disabled>Exportar CSV</button>
+        </div>
+      </div>
+      <div id="active-filters" class="active-filters"></div>
     </div>
   </header>
 
   <main class="container">
-    <section class="cards cards-4">
-      <div class="card">
-        <div class="card-title">Filas (ítems)</div>
-        <div class="card-value" id="m-rows">0</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Vendedores</div>
-        <div class="card-value" id="m-vendedores">0</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Ingreso (importe ítems)</div>
-        <div class="card-value" id="m-importe">0</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Margen (%)</div>
-        <div class="card-value" id="m-margen">0%</div>
-        <div class="card-sub" id="m-margen-detalle">Ingresos: $0 · Costos: $0</div>
-      </div>
+    <section class="cards cards-6">
+      <div class="card"><div class="card-title">Ingresos</div><div class="card-value" id="k-ingresos">$0</div></div>
+      <div class="card"><div class="card-title">Costos</div><div class="card-value" id="k-costos">$0</div></div>
+      <div class="card"><div class="card-title">Margen</div><div class="card-value" id="k-margen">$0</div></div>
+      <div class="card"><div class="card-title">Margen %</div><div class="card-value" id="k-margen-pct">0%</div></div>
+      <div class="card"><div class="card-title">Presupuestos</div><div class="card-value" id="k-presu">0</div></div>
+      <div class="card"><div class="card-title">Ticket prom.</div><div class="card-value" id="k-ticket">$0</div></div>
     </section>
 
-    <section class="grid-2">
-      <div class="panel">
-        <h2>Ventas por vendedor (Top)</h2>
-        <div class="toolbar">
-          <label>Top <input type="number" id="top-vendedores" value="10" min="3" max="50"></label>
+    <section class="tabs panel">
+      <div class="tabs-header">
+        <div class="tabs-left">
+          <button class="tab active" data-tab="vend">Vendedores</button>
+          <button class="tab" data-tab="cli">Clientes</button>
+          <button class="tab" data-tab="suc">Sucursales</button>
         </div>
-        <canvas id="chartVendedores" height="240"></canvas>
-      </div>
-
-      <div class="panel">
-        <h2>Ventas por cliente (Top)</h2>
-        <div class="toolbar">
-          <label>Top <input type="number" id="top-clientes" value="10" min="3" max="50"></label>
-        </div>
-        <canvas id="chartClientes" height="240"></canvas>
-      </div>
-    </section>
-
-    <section class="grid-2">
-      <div class="panel">
-        <h2>Pareto de artículos</h2>
-        <div class="table-wrapper">
-          <table id="tbl-pareto-articulos">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Artículo</th>
-                <th>Ingreso</th>
-                <th>%</th>
-                <th>% Acum.</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+        <div class="tabs-right">
+          <label>Top
+            <select id="topN">
+              <option>5</option><option selected>10</option><option>15</option><option>20</option>
+            </select>
+          </label>
         </div>
       </div>
-
-      <div class="panel">
-        <h2>Pareto de clientes</h2>
-        <div class="table-wrapper">
-          <table id="tbl-pareto-clientes">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Cliente</th>
-                <th>Ingreso</th>
-                <th>%</th>
-                <th>% Acum.</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+      <div class="tabs-body">
+        <div class="tab-pane active" id="pane-vend">
+          <div class="two">
+            <div><canvas id="chartVend" height="160"></canvas></div>
+            <div class="table-wrapper">
+              <table id="tbl-vend" data-kind="vendedor" class="table-10">
+                <thead><tr><th>Vendedor</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="pane-cli">
+          <div class="two">
+            <div><canvas id="chartCli" height="160"></canvas></div>
+            <div class="table-wrapper">
+              <table id="tbl-cli" data-kind="cliente" class="table-10">
+                <thead><tr><th>Cliente</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="pane-suc">
+          <div class="two">
+            <div><canvas id="chartSuc" height="160"></canvas></div>
+            <div class="table-wrapper">
+              <table id="tbl-suc" data-kind="sucursal" class="table-10">
+                <thead><tr><th>Sucursal</th><th>Presu</th><th>Ítems</th><th>Ingreso</th><th>Margen</th><th>%</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="panel">
-      <h2>Presupuestos (cabeceras)</h2>
+      <div class="panel-head">
+        <h2>Presupuestos</h2>
+        <div class="search-inline">
+          <input id="q-id" placeholder="Buscar ID (exacto)" />
+        </div>
+      </div>
       <div class="table-wrapper">
         <table id="tbl-heads">
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>ID</th>
-              <th>Comprobante</th>
-              <th>Cliente</th>
-              <th>Vendedor</th>
-              <th>Ítems</th>
-              <th>Ingreso</th>
-              <th>Costo</th>
-              <th>Margen</th>
-              <th>%</th>
+              <th>Fecha</th><th>ID</th><th>Comprobante</th><th>Cliente</th>
+              <th>Vendedor</th><th>Sucursal</th><th>Ítems</th>
+              <th>Ingreso</th><th>Costo</th><th>Margen</th><th>%</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-      <div class="pagination" id="paginacion-heads"></div>
+      <div class="pagination" id="pg-heads"></div>
     </section>
 
     <section class="panel">
-      <h2>Detalle (ítems)</h2>
+      <div class="panel-head"><h2>Ítems (detalle del conjunto)</h2></div>
       <div class="table-wrapper">
-        <table id="tbl-detalle">
+        <table id="tbl-items">
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>Comprobante</th>
-              <th>Estado</th>
-              <th>Cliente</th>
-              <th>Vendedor</th>
-              <th>Artículo</th>
-              <th>Cant.</th>
-              <th>Precio</th>
-              <th>Importe Ítem</th>
-              <th>Costo</th>
-              <th>Margen</th>
-              <th>%</th>
+              <th>Fecha</th><th>ID</th><th>Comprobante</th><th>Estado</th>
+              <th>Cliente</th><th>Vendedor</th><th>Sucursal</th>
+              <th>Artículo</th><th>Cant.</th><th>Precio</th>
+              <th>Importe</th><th>Costo</th><th>Margen</th><th>%</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-      <div class="pagination" id="paginacion"></div>
+      <div class="pagination" id="pg-items"></div>
     </section>
   </main>
 
   <aside id="drawer">
     <div class="drawer-header">
-      <h3 id="drawer-title">Presupuesto</h3>
-      <button id="drawer-close" aria-label="Cerrar">✕</button>
+      <div class="drawer-title" id="dw-title">Presupuesto</div>
+      <button id="dw-close" aria-label="Cerrar">✕</button>
     </div>
     <div class="drawer-body">
-      <div class="meta" id="drawer-meta"></div>
-      <div class="table-wrapper">
-        <table id="drawer-table">
-          <thead>
-            <tr>
-              <th>Artículo</th>
-              <th>Cant.</th>
-              <th>Precio</th>
-              <th>Importe</th>
-              <th>Costo</th>
-              <th>Margen</th>
-              <th>%</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <div id="dw-meta" class="meta"></div>
+      <div class="tabs small">
+        <div class="tabs-header">
+          <button class="tab active" data-tab="dw-items">Ítems</button>
+          <button class="tab" data-tab="dw-res">Resumen</button>
+        </div>
+        <div class="tabs-body">
+          <div class="tab-pane active" id="pane-dw-items">
+            <div class="table-wrapper">
+              <table id="dw-table">
+                <thead>
+                  <tr><th>Artículo</th><th>Cant.</th><th>Precio</th><th>Importe</th><th>Costo</th><th>Margen</th><th>%</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane" id="pane-dw-res">
+            <div class="table-wrapper">
+              <table id="dw-res-table">
+                <thead><tr><th>Grupo</th><th>Clave</th><th>Ítems</th><th>Ingreso</th><th>Costo</th><th>Margen</th><th>%</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </aside>
 
-  <footer class="foot">
-    <span id="status">Listo.</span>
-  </footer>
-
+  <footer class="foot"><span id="status">Listo.</span></footer>
   <script src="./app.js"></script>
 </body>
 </html>
