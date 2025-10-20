@@ -121,24 +121,40 @@ async function fetchAndRender(){
 }
 
 /* ======== Render global según filtros ======== */
-function render(){
+function render() {
+  // 1) Capturar filtros de la UI y pintar chips
   captureFiltersFromUI();
   paintActiveFilters();
 
+  // 2) Aplicar filtros al dataset
   const filtered = applyFilters(rows);
-  const k = kpis(filtered);
-  $('#k-ingresos').textContent = money(k.ingresos);
-  $('#k-costos').textContent   = money(k.costos);
-  $('#k-margen').textContent   = money(k.margen);
-  $('#k-margen-pct').textContent = pct(k.margenPct);
-  $('#k-presu').textContent = int(countHeads(filtered));
-  $('#k-ticket').textContent = money(ticketProm(filtered));
 
+  // 3) KPIs (formato compacto para que no rompa el layout)
+  const k = kpis(filtered);
+  $('#k-ingresos').textContent   = moneyCompact(k.ingresos);
+  $('#k-costos').textContent     = moneyCompact(k.costos);
+  $('#k-margen').textContent     = moneyCompact(k.margen);
+  $('#k-margen-pct').textContent = pct(k.margenPct);
+  $('#k-presu').textContent      = int(countHeads(filtered));
+  $('#k-ticket').textContent     = moneyCompact(ticketProm(filtered));
+
+  // 4) Gráficos + tablas agregadas (Top-N) con cross-filter
   drawChartsFrom(filtered);
   renderAggTables(filtered);
+
+  // 5) Presupuestos (master) con paginación y buscador de ID
   renderHeads(qId.value.trim(), filtered);
+
+  // 6) Artículos destacados (Top-N por ingreso)
   renderTopArt(filtered);
+
+  // 7) Habilitar/Deshabilitar export según haya datos
+  btnCsv.disabled = filtered.length === 0;
+
+  // 8) Estado en el footer
+  setStatus(`Vista: ${filtered.length.toLocaleString('es-AR')} ítems · ${countHeads(filtered)} presupuestos`);
 }
+
 
 /* ======== Top Artículos ======== */
 function renderTopArt(data){
@@ -486,3 +502,13 @@ function clearFilters(){
   qId.value = '';
   topN.value = String(state.topN || 10);
 }
+
+function moneyCompact(n){
+  try {
+    return new Intl.NumberFormat('es-AR', {
+      notation: 'compact', compactDisplay: 'short',
+      maximumFractionDigits: 2
+    }).format(Number(n)||0);
+  } catch { return money(n); }
+}
+
